@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-femme-plum: #7f165b;
+  --color-femme-mauve: #bd708c;
+  --color-femme-orange: #b45100;
+  --color-femme-cream: #fdf8ea;
+  --color-femme-pale: #efd5e1;
+  --color-femme-dark: #3f0d2a;
+  --color-femme-sage: #6f7961;
+  --color-femme-pink: #ddadbc;
+  --color-femme-lavender: #e7abd6;
+  --color-femme-brown: #6a4c28;
+}
+
+@layer base {
+  body {
+    @apply bg-femme-cream text-femme-dark font-sans antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display font-black tracking-tight;
+  }
+}
+
+.grain-bg {
+  position: relative;
+}
+
+.grain-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  z-index: 1;
+}
