@@ -5,42 +5,69 @@ export default function Hero() {
     <section className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden grain-bg">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1523438885200-e635ba2c371e?q=80&w=2000&auto=format&fit=crop" 
-          alt="Floral background"
-          className="w-full h-full object-cover opacity-80"
-          referrerPolicy="no-referrer"
+        <img
+          src="/hero-background.svg"
+          alt="Femme Events hero background"
+          className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-femme-plum/20 via-transparent to-femme-plum/40" />
+        {/* Stronger bottom gradient so info bar is always legible */}
+        <div className="absolute inset-0 bg-gradient-to-b from-femme-plum/30 via-transparent to-femme-dark/75" />
       </div>
 
       {/* Main Title */}
-      <div className="relative z-10 text-center">
-        <motion.h1 
+      <div className="relative z-10 text-center px-4 flex flex-col items-center gap-5">
+        <motion.h1
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="text-[15vw] leading-[0.8] text-white uppercase drop-shadow-2xl"
+          className="text-[14vw] leading-[0.85] text-white uppercase drop-shadow-2xl"
         >
           Femme Events
         </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+          className="text-white/90 text-lg md:text-xl uppercase tracking-[0.3em] drop-shadow-md"
+          style={{ fontFamily: "Balgin, serif" }}
+        >
+          Atlanta Wedding Partial Planning &amp; Design
+        </motion.p>
       </div>
 
-      {/* Bottom Info */}
-      <div className="absolute bottom-12 left-0 right-0 z-10 px-12 flex justify-between items-end text-white text-sm font-medium">
-        <div className="flex flex-col gap-1">
-          <span className="opacity-60 text-[10px] uppercase tracking-widest">Location</span>
-          <span>Atlanta, GA</span>
+      {/* Bottom Info Bar */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 0.6 }}
+        className="absolute bottom-10 left-0 right-0 z-10 px-10 md:px-16 flex justify-between items-end text-white flex-wrap gap-6"
+      >
+        <div className="flex flex-col gap-2">
+          <span className="text-xs uppercase tracking-widest opacity-75">Location</span>
+          <span className="text-xl font-medium drop-shadow-md">Atlanta, GA</span>
         </div>
-        <div className="flex flex-col gap-1 text-center">
-          <span className="opacity-60 text-[10px] uppercase tracking-widest">Email</span>
-          <span>Amanda@FemmeEvents.com</span>
+        <div className="flex flex-col gap-2 text-center">
+          <span className="text-xs uppercase tracking-widest opacity-75">Email</span>
+          <span className="text-xl font-medium drop-shadow-md">
+            Amanda<span style={{ fontFamily: 'system-ui, sans-serif' }}>@</span>FemmeEvents.com
+          </span>
         </div>
-        <div className="flex flex-col gap-1 text-right">
-          <span className="opacity-60 text-[10px] uppercase tracking-widest">Social</span>
-          <span>@_femmeevents</span>
+        <div className="flex flex-col gap-2 text-center">
+          <span className="text-xs uppercase tracking-widest opacity-75">Instagram</span>
+          <a
+            href="https://www.instagram.com/_femmeevents/?hl=en"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xl font-medium drop-shadow-md hover:opacity-70 transition-opacity duration-200"
+          >
+            <span style={{ fontFamily: 'system-ui, sans-serif' }}>@_</span>femmeevents
+          </a>
         </div>
-      </div>
+        <div className="flex flex-col gap-2 text-right">
+          <span className="text-xs uppercase tracking-widest opacity-75">Phone</span>
+          <span className="text-xl font-medium drop-shadow-md" style={{ fontFamily: 'system-ui, sans-serif' }}>(678) 644-5257</span>
+        </div>
+      </motion.div>
     </section>
   );
 }
