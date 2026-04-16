@@ -13,10 +13,7 @@ export default function Footer() {
 
         <div className="flex flex-col gap-6">
           <h4 className="text-sm uppercase tracking-[0.2em] font-bold opacity-40">Location</h4>
-          <div className="text-base leading-relaxed">
-            123 Kitschy Lane<br />
-            Atlanta, GA 30301
-          </div>
+          <p className="text-base text-femme-dark/80">Serving Atlanta and surrounding areas</p>
         </div>
 
         <div className="flex flex-col gap-6">
@@ -47,7 +44,7 @@ export default function Footer() {
       </div>
 
       <div className="mt-20 pt-8 border-t border-femme-plum/5 flex justify-between items-center text-xs uppercase tracking-widest font-bold opacity-30">
-        <span>&copy; 2025 Femme Events</span>
+        <span>&copy; 2026 Femme Events</span>
         <span>All Rights Reserved</span>
       </div>
     </footer>
