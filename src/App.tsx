@@ -10,6 +10,7 @@ import Services from "./components/Services";
 import Process from "./components/Process";
 import Portfolio from "./components/Portfolio";
 import Testimonials from "./components/Testimonials";
+import FAQ from "./components/FAQ";
 import Inquiry from "./components/Inquiry";
 import Footer from "./components/Footer";
 
@@ -23,6 +24,7 @@ export default function App() {
       <Process />
       <Portfolio />
       <Testimonials />
+      <FAQ />
       <Inquiry />
       <Footer />
     </main>
