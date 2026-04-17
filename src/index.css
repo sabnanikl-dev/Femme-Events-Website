@@ -42,6 +42,7 @@
 
   /* 30% — Dark Raspberry: buttons, badges, accent lines, hover states */
   --color-femme-plum: #831654;     /* dark-raspberry-700 — primary buttons & badges */
+  --color-femme-deep: #570f38;     /* dark-raspberry-800 — button hover / pressed state */
   --color-femme-mauve: #ae1e70;    /* dark-raspberry-600 — hover states, secondary accents */
   --color-femme-orange: #e151a3;   /* dark-raspberry-400 — accent dividers & highlights */
 
