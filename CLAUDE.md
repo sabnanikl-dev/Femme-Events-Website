@@ -58,6 +58,8 @@
 - Create code without an Issue — every PR must trace back to a task
 - Include multiple unrelated changes in one PR — one task, one PR
 - Self-approve or merge your own PR
+- Leave work stranded on a branch — before declaring PR work complete, audit every `fe/cd-*` and `fe/hermes-*` branch. Close stale branches. Open PRs only for the most recent branch and close older ones.
+- Commit directly to a preview or integration branch without a backing Issue — any fix or refinement discovered during a preview or local test session must first be filed as a GitHub Issue. No ad-hoc commits on branches like `preview/all-issues` without Issue linkage.
 
 ---
 
