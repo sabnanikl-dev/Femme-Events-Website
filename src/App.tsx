@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
 import Services from "./components/Services";
+import Process from "./components/Process";
 import Testimonials from "./components/Testimonials";
 import Inquiry from "./components/Inquiry";
 import Footer from "./components/Footer";
@@ -18,6 +19,7 @@ export default function App() {
       <Hero />
       <About />
       <Services />
+      <Process />
       <Testimonials />
       <Inquiry />
       <Footer />
