@@ -50,11 +50,11 @@ export function FramerCarousel({ items }: FramerCarouselProps) {
       <div className="relative overflow-hidden rounded-2xl" ref={containerRef}>
         <motion.div className="flex" style={{ x }}>
           {items.map((item) => (
-            <div key={item.id} className="shrink-0 w-full h-[750px] relative">
+            <div key={item.id} className="shrink-0 w-full h-[750px] relative bg-femme-dark rounded-2xl">
               <img
                 src={item.url}
                 alt={`${item.couple} — ${item.detail}`}
-                className="w-full h-full object-cover rounded-2xl select-none pointer-events-none"
+                className="w-full h-full object-contain rounded-2xl select-none pointer-events-none"
                 draggable={false}
               />
               {/* Gradient overlay */}
