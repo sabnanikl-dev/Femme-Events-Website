@@ -30,13 +30,14 @@ export default function About() {
         <p className="text-femme-dark/80 text-xl leading-relaxed max-w-lg">
           Look, anyone can book a ballroom. We zero in on the tiny moments—grandma's happy tears, the inside joke on the cocktail napkin, the playlist that makes cousins dance together on purpose.
         </p>
-        <motion.button
+        <motion.a
+          href="#services"
           whileHover={{ scale: 1.03, backgroundColor: "#3f0d2a" }}
           whileTap={{ scale: 0.97 }}
           className="bg-femme-plum text-white px-12 py-4 rounded-full font-medium text-base w-fit shadow-lg transition-colors duration-200 cursor-pointer"
         >
           Learn More
-        </motion.button>
+        </motion.a>
       </motion.div>
     </section>
   );
