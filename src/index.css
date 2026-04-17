@@ -31,18 +31,25 @@
   --font-subheading: "Balgin", serif;
   --font-sans: "The Seasons", serif;
 
-  --color-femme-plum: #7f165b;
-  --color-femme-mauve: #bd708c;
-  --color-femme-orange: #b45100;
-  --color-femme-cream: #fdf8ea;
-  --color-femme-pale: #efd5e1;
-  --color-femme-dark: #3f0d2a;
-  --color-femme-sage: #6f7961;
-  --color-femme-pink: #ddadbc;
-  --color-femme-lavender: #e7abd6;
-  --color-femme-brown: #6a4c28;
-  --color-femme-rose: #ffd7e1;
-  --color-femme-coral: #ffcccc;
+  /* ── 60-30-10 Palette ──────────────────────────────────────────────────── */
+
+  /* 60% — Soft Blossom: backgrounds, surfaces, body text */
+  --color-femme-cream: #f7edf0;    /* soft-blossom-50  — lightest bg (body, Process) */
+  --color-femme-pale: #f0dbe1;     /* soft-blossom-100 — light section bg (Testimonials, FAQ, Footer) */
+  --color-femme-lavender: #e1b7c4; /* soft-blossom-200 — medium section bg (About, Services, Inquiry) */
+  --color-femme-pink: #d293a6;     /* soft-blossom-300 — light details, card borders */
+  --color-femme-dark: #240f15;     /* soft-blossom-900 — darkest text, photo overlays */
+
+  /* 30% — Dark Raspberry: buttons, badges, accent lines, hover states */
+  --color-femme-plum: #831654;     /* dark-raspberry-700 — primary buttons & badges */
+  --color-femme-mauve: #ae1e70;    /* dark-raspberry-600 — hover states, secondary accents */
+  --color-femme-orange: #e151a3;   /* dark-raspberry-400 — accent dividers & highlights */
+
+  /* 10% — Fuchsia-Plum / Wisteria / Pink Orchid: small details & depth */
+  --color-femme-rose: #f4d7ec;     /* pink-orchid-100   — very light orchid tint */
+  --color-femme-coral: #eddaf1;    /* wisteria-100      — very light wisteria tint */
+  --color-femme-sage: #c56d99;     /* fuchsia-plum-400  — subtle fuchsia detail */
+  --color-femme-brown: #622b6e;    /* wisteria-700      — deep wisteria depth */
 }
 
 /* ─── Base Styles ──────────────────────────────── */

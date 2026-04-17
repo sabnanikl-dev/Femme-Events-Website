@@ -33,6 +33,23 @@ export default function Hero() {
         >
           Atlanta Wedding Partial Planning &amp; Design
         </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.7, ease: "easeOut" }}
+          className="mt-14"
+        >
+          <motion.a
+            href="#inquiry"
+            whileHover={{ scale: 1.05, backgroundColor: "#570f38", boxShadow: "0 8px 28px rgba(131,22,84,0.5)" }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            style={{ backgroundColor: "#831654" }}
+            className="inline-block text-white px-10 py-4 rounded-full font-bold text-sm uppercase tracking-widest shadow-lg font-system"
+          >
+            Let's Chat
+          </motion.a>
+        </motion.div>
       </div>
 
       {/* Bottom Info Bar */}
