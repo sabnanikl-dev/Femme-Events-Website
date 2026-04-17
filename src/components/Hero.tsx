@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { ButtonCta } from "@/components/ui/button-shiny";
 
 export default function Hero() {
   return (
@@ -33,17 +34,17 @@ export default function Hero() {
         >
           Atlanta Wedding Partial Planning &amp; Design
         </motion.p>
-        <motion.a
-          href="#inquiry"
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.7, ease: "easeOut" }}
-          whileHover={{ scale: 1.04, backgroundColor: "#3f0d2a" }}
-          whileTap={{ scale: 0.97 }}
-          className="mt-2 bg-femme-plum text-white px-10 py-4 rounded-full font-bold text-sm uppercase tracking-widest shadow-lg transition-colors duration-200 font-system"
+          className="mt-2"
         >
-          Book a Consultation
-        </motion.a>
+          <ButtonCta
+            label="Book a Consultation"
+            onClick={() => document.getElementById("inquiry")?.scrollIntoView({ behavior: "smooth" })}
+          />
+        </motion.div>
       </div>
 
       {/* Bottom Info Bar */}
