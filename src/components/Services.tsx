@@ -180,7 +180,7 @@ export default function Services() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="mt-20 border-t border-femme-dark/10 pt-16"
       >
-        <h3 className="text-4xl text-femme-dark mb-3">À La Carte Add-ons</h3>
+        <h3 className="text-4xl text-femme-dark mb-3 font-system">À La Carte Add-ons</h3>
         <p className="text-femme-dark/60 text-base mb-10 font-system">
           Mix and match to make it yours.
         </p>

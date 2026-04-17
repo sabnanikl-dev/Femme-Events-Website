@@ -37,7 +37,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.7, ease: "easeOut" }}
-          className="mt-2"
+          className="mt-14"
         >
           <motion.a
             href="#inquiry"
@@ -47,7 +47,7 @@ export default function Hero() {
             style={{ backgroundColor: "#7f165b" }}
             className="inline-block text-white px-10 py-4 rounded-full font-bold text-sm uppercase tracking-widest shadow-lg font-system"
           >
-            Book a Consultation
+            Let's Chat
           </motion.a>
         </motion.div>
       </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
-const labelClass = "text-xs uppercase tracking-widest font-bold opacity-60";
+const labelClass = "text-xs uppercase tracking-widest font-bold opacity-60 font-system";
 const inputClass =
   "bg-transparent border border-femme-dark/30 px-4 py-3 text-base focus:border-femme-dark outline-none transition-colors duration-200 font-system";
 
@@ -14,7 +14,7 @@ export default function Inquiry() {
         <h2 className="text-6xl md:text-8xl text-femme-dark leading-[0.95] italic">
           Ready to Chat Dates &amp; Dreams?
         </h2>
-        <p className="text-femme-dark/70 text-xl">
+        <p className="text-femme-dark/70 text-xl font-system">
           Drop us a line and let's see if your calendar and our magic align.
         </p>
       </div>

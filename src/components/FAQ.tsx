@@ -51,7 +51,7 @@ function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
         className="w-full flex justify-between items-center py-6 gap-6 text-left group cursor-pointer"
         aria-expanded={open}
       >
-        <span className="text-xl md:text-2xl text-femme-dark group-hover:text-femme-plum transition-colors duration-200 font-balgin">
+        <span className="text-xl md:text-2xl text-femme-dark group-hover:text-femme-plum transition-colors duration-200 font-system">
           {faq.question}
         </span>
         <span className="shrink-0 w-8 h-8 rounded-full border border-femme-plum/40 flex items-center justify-center text-femme-plum group-hover:bg-femme-plum group-hover:text-white transition-colors duration-200">

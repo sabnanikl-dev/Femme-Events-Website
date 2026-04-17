@@ -8,7 +8,7 @@ export default function Footer() {
             alt="Femme Events"
             className="h-24 w-auto object-contain object-left"
           />
-          <p className="text-sm opacity-60">Made with love in Atlanta.</p>
+          <p className="text-sm opacity-60 font-system">Made with love in Atlanta.</p>
         </div>
 
         <div className="flex flex-col gap-2">
@@ -43,7 +43,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="mt-8 pt-6 border-t border-femme-plum/5 flex justify-between items-center text-xs uppercase tracking-widest font-bold opacity-30">
+      <div className="mt-8 pt-6 border-t border-femme-plum/5 flex justify-between items-center text-xs uppercase tracking-widest font-bold opacity-30 font-system">
         <span>&copy; 2026 Femme Events</span>
         <span>All Rights Reserved</span>
       </div>
