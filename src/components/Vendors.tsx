@@ -51,7 +51,7 @@ const vendorCategories: VendorCategory[] = [
   {
     label: "Music & DJ",
     vendors: [
-      { name: " Atlanta Music Exchange", specialty: "Live bands & DJ packages", url: "#" },
+      { name: "Atlanta Music Exchange", specialty: "Live bands & DJ packages", url: "#" },
     ],
   },
 ];
@@ -79,7 +79,7 @@ function VendorCard({ vendor, index }: { vendor: Vendor; index: number }) {
           target="_blank"
           rel="noopener noreferrer"
           className="shrink-0 w-7 h-7 rounded-full border border-femme-plum/40 text-femme-plum flex items-center justify-center
-            opacity-0 group-hover:opacity-100 hover:bg-femme-plum hover:text-white transition-all duration-200"
+            opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-femme-plum hover:text-white transition-all duration-200"
           aria-label={`Visit ${vendor.name}`}
         >
           <ExternalLink size={13} strokeWidth={2} />
@@ -91,7 +91,7 @@ function VendorCard({ vendor, index }: { vendor: Vendor; index: number }) {
 
 export default function Vendors() {
   return (
-    <section className="py-24 px-6 md:px-24 bg-femme-pale">
+    <section className="py-24 px-6 md:px-24 bg-femme-cream">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
