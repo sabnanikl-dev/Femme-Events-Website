@@ -138,7 +138,7 @@ export default function Inquiry() {
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="bg-femme-plum text-white py-4 text-base font-bold shadow-lg hover:bg-femme-dark transition-colors duration-200 mt-2 cursor-pointer"
+          className="bg-femme-plum text-white py-4 text-base font-bold shadow-lg hover:bg-femme-dark transition-colors duration-200 mt-2 cursor-pointer rounded-full font-system"
         >
           Send Inquiry
         </motion.button>

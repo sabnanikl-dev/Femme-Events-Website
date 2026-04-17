@@ -18,7 +18,7 @@ export default function Footer() {
 
         <div className="flex flex-col gap-2">
           <h4 className="text-sm uppercase tracking-[0.2em] font-bold opacity-40">Contact</h4>
-          <div className="text-base leading-relaxed">
+          <div className="text-base leading-relaxed font-system">
             <a
               href="mailto:amanda@femmeevents.com"
               className="hover:text-femme-plum transition-colors duration-200 block"
