@@ -32,7 +32,7 @@ export default function About() {
         </p>
         <motion.a
           href="#services"
-          whileHover={{ scale: 1.03, backgroundColor: "#570f38" }}
+          whileHover={{ scale: 1.03, backgroundColor: "var(--color-femme-deep)" }}
           whileTap={{ scale: 0.97 }}
           className="bg-femme-plum text-white px-12 py-4 rounded-full font-medium text-base w-fit shadow-lg transition-colors duration-200 cursor-pointer"
         >
