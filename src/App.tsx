@@ -11,6 +11,7 @@ import About from "./components/About";
 import Services from "./components/Services";
 import Process from "./components/Process";
 import Testimonials from "./components/Testimonials";
+import Vendors from "./components/Vendors";
 import FAQ from "./components/FAQ";
 import Inquiry from "./components/Inquiry";
 import BlogIndex from "./pages/BlogIndex";
@@ -24,6 +25,7 @@ function Home() {
       <Services />
       <Process />
       <Testimonials />
+      <Vendors />
       <FAQ />
       <Inquiry />
     </main>
