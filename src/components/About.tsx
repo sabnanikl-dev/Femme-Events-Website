@@ -8,7 +8,7 @@ export default function About() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative w-4/5"
+        className="relative w-4/5 ml-auto"
       >
         <img
           src="/photos/pt2.jpg"
