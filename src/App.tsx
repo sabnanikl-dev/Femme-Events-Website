@@ -8,6 +8,7 @@ import Hero from "./components/Hero";
 import About from "./components/About";
 import Services from "./components/Services";
 import Testimonials from "./components/Testimonials";
+import FAQ from "./components/FAQ";
 import Inquiry from "./components/Inquiry";
 import Footer from "./components/Footer";
 
@@ -19,6 +20,7 @@ export default function App() {
       <About />
       <Services />
       <Testimonials />
+      <FAQ />
       <Inquiry />
       <Footer />
     </main>
