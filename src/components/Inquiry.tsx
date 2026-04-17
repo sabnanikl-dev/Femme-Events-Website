@@ -27,7 +27,8 @@ export default function Inquiry() {
     setState("loading");
     setErrorMsg("");
 
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const data: Record<string, string> = {};
     formData.forEach((value, key) => {
       data[key] = value as string;
@@ -43,9 +44,9 @@ export default function Inquiry() {
         body: JSON.stringify(data),
       });
 
-      if (res.ok || res.status === 200 || res.status === 302) {
+      if (res.ok) {
         setState("success");
-        e.currentTarget.reset();
+        form.reset();
       } else {
         throw new Error(`Server responded with ${res.status}`);
       }
@@ -101,24 +102,20 @@ export default function Inquiry() {
         </p>
       </div>
 
-      <form
+      <motion.form
         onSubmit={handleSubmit}
         className="flex flex-col gap-5"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: state === "error" ? 1 : 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className={`flex items-start gap-3 p-4 rounded-lg border ${
-            state === "error"
-              ? "bg-red-50 border-red-200 text-red-700"
-              : "bg-transparent border-transparent"
-          } ${state === "error" ? "opacity-100" : "opacity-0 invisible absolute"}`}
-        >
-          <AlertCircle size={20} className="shrink-0 mt-0.5" />
-          <p className="text-sm font-system">{errorMsg}</p>
-        </motion.div>
+        {state === "error" && (
+          <div className="flex items-start gap-3 p-4 rounded-lg border bg-red-50 border-red-200 text-red-700">
+            <AlertCircle size={20} className="shrink-0 mt-0.5" />
+            <p className="text-sm font-system">{errorMsg}</p>
+          </div>
+        )}
 
         {/* Name */}
         <div className="grid grid-cols-2 gap-4">
@@ -246,7 +243,7 @@ export default function Inquiry() {
           {submitting && <Loader2 size={18} className="animate-spin" />}
           {submitting ? "Sending..." : "Send Inquiry"}
         </motion.button>
-      </form>
+      </motion.form>
     </section>
   );
 }
