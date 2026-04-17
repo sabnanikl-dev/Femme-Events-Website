@@ -128,3 +128,20 @@ Femme Events — wedding coordination and event planning brand. React + TypeScri
 - Headless CMS: Sanity.io for blog management (non-technical user: Amanda)
 - DNS: Registered on domain.com, Vercel deployment pending
 - Branch protection active on `main` — requires PRs, blocks force-pushes
+
+---
+
+## End-Session Protocol
+
+The repository contains an audit checklist at `.claude/skills/end-session-audit.md`. Every agent MUST run this checklist before declaring a session complete.
+
+**What it checks:**
+1. All branches have unmerged commits listed
+2. Every commit traces back to a GitHub Issue
+3. Any orphaned fixes (no Issue) are flagged
+4. Missing PRs are created for every active branch
+5. Uncommitted changes are pushed or flagged
+6. Summary reported — confirms: "All work pushed, all PRs linked, no orphaned branches"
+
+**Lead Dev agents (Claude Code, Codex, GPT):** run this checklist before every sign-off.
+**Hermes:** verify the audit was actually run when reviewing a PR or session output.
