@@ -31,18 +31,19 @@
   --font-subheading: "Balgin", serif;
   --font-sans: "The Seasons", serif;
 
-  --color-femme-plum: #7f165b;
-  --color-femme-mauve: #bd708c;
-  --color-femme-orange: #b45100;
-  --color-femme-cream: #fdf8ea;
-  --color-femme-pale: #efd5e1;
-  --color-femme-dark: #3f0d2a;
-  --color-femme-sage: #6f7961;
-  --color-femme-pink: #ddadbc;
-  --color-femme-lavender: #e7abd6;
-  --color-femme-brown: #6a4c28;
-  --color-femme-rose: #ffd7e1;
-  --color-femme-coral: #ffcccc;
+  /* ── New palette preview (soft-blossom / fuchsia-plum / wisteria / dark-raspberry / pink-orchid) ── */
+  --color-femme-plum: #923a66;     /* fuchsia-plum-600  — primary buttons & accents */
+  --color-femme-mauve: #c36f88;    /* soft-blossom-400  — mid-tone pink */
+  --color-femme-orange: #da258c;   /* dark-raspberry-500 — vibrant accent (dividers, highlights) */
+  --color-femme-cream: #f7edf0;    /* soft-blossom-50   — lightest background */
+  --color-femme-pale: #f0dbe1;     /* soft-blossom-100  — light section bg */
+  --color-femme-dark: #491d33;     /* fuchsia-plum-800  — darkest text/bg */
+  --color-femme-sage: #82395f;     /* pink-orchid-700   — replacing sage with deep orchid */
+  --color-femme-pink: #e1b7c4;     /* soft-blossom-200  — light pink details */
+  --color-femme-lavender: #dab6e2; /* wisteria-200       — lavender section bg */
+  --color-femme-brown: #6d2c4d;    /* wisteria-700       — replacing brown with deep wisteria */
+  --color-femme-rose: #f8d3e8;     /* dark-raspberry-100 — very light rose */
+  --color-femme-coral: #f4d7ec;    /* pink-orchid-100    — very light orchid */
 }
 
 /* ─── Base Styles ──────────────────────────────── */
