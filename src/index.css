@@ -31,19 +31,25 @@
   --font-subheading: "Balgin", serif;
   --font-sans: "The Seasons", serif;
 
-  /* ── New palette preview (soft-blossom / fuchsia-plum / wisteria / dark-raspberry / pink-orchid) ── */
-  --color-femme-plum: #923a66;     /* fuchsia-plum-600  — primary buttons & accents */
-  --color-femme-mauve: #c36f88;    /* soft-blossom-400  — mid-tone pink */
-  --color-femme-orange: #da258c;   /* dark-raspberry-500 — vibrant accent (dividers, highlights) */
-  --color-femme-cream: #f7edf0;    /* soft-blossom-50   — lightest background */
-  --color-femme-pale: #f0dbe1;     /* soft-blossom-100  — light section bg */
-  --color-femme-dark: #491d33;     /* fuchsia-plum-800  — darkest text/bg */
-  --color-femme-sage: #82395f;     /* pink-orchid-700   — replacing sage with deep orchid */
-  --color-femme-pink: #e1b7c4;     /* soft-blossom-200  — light pink details */
-  --color-femme-lavender: #dab6e2; /* wisteria-200       — lavender section bg */
-  --color-femme-brown: #6d2c4d;    /* wisteria-700       — replacing brown with deep wisteria */
-  --color-femme-rose: #f8d3e8;     /* dark-raspberry-100 — very light rose */
-  --color-femme-coral: #f4d7ec;    /* pink-orchid-100    — very light orchid */
+  /* ── 60-30-10 Palette ──────────────────────────────────────────────────── */
+
+  /* 60% — Soft Blossom: backgrounds, surfaces, body text */
+  --color-femme-cream: #f7edf0;    /* soft-blossom-50  — lightest bg (body, Process) */
+  --color-femme-pale: #f0dbe1;     /* soft-blossom-100 — light section bg (Testimonials, FAQ, Footer) */
+  --color-femme-lavender: #e1b7c4; /* soft-blossom-200 — medium section bg (About, Services, Inquiry) */
+  --color-femme-pink: #d293a6;     /* soft-blossom-300 — light details, card borders */
+  --color-femme-dark: #240f15;     /* soft-blossom-900 — darkest text, photo overlays */
+
+  /* 30% — Dark Raspberry: buttons, badges, accent lines, hover states */
+  --color-femme-plum: #831654;     /* dark-raspberry-700 — primary buttons & badges */
+  --color-femme-mauve: #ae1e70;    /* dark-raspberry-600 — hover states, secondary accents */
+  --color-femme-orange: #e151a3;   /* dark-raspberry-400 — accent dividers & highlights */
+
+  /* 10% — Fuchsia-Plum / Wisteria / Pink Orchid: small details & depth */
+  --color-femme-rose: #f4d7ec;     /* pink-orchid-100   — very light orchid tint */
+  --color-femme-coral: #eddaf1;    /* wisteria-100      — very light wisteria tint */
+  --color-femme-sage: #c56d99;     /* fuchsia-plum-400  — subtle fuchsia detail */
+  --color-femme-brown: #622b6e;    /* wisteria-700      — deep wisteria depth */
 }
 
 /* ─── Base Styles ──────────────────────────────── */
