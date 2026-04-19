@@ -13,6 +13,8 @@ export default function About() {
         <img
           src="/photos/pt2.jpg"
           alt="Bridal detail flat lay with shoes, invitation and rings"
+          loading="lazy"
+          decoding="async"
           className="w-full h-auto object-contain shadow-2xl"
         />
       </motion.div>

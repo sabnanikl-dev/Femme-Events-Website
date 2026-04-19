@@ -6,6 +6,8 @@ export default function Footer() {
           <img
             src="/logo-footer.svg"
             alt="Femme Events"
+            loading="lazy"
+            decoding="async"
             className="h-24 w-auto object-contain object-left"
           />
           <p className="text-sm opacity-60 font-system">Made with love in Atlanta.</p>

@@ -8,6 +8,8 @@ export default function Hero() {
         <img
           src="/hero-background.svg"
           alt="Femme Events hero background"
+          fetchPriority="high"
+          decoding="async"
           className="w-full h-full object-cover object-center"
         />
         {/* Stronger bottom gradient so info bar is always legible */}

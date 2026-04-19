@@ -104,6 +104,7 @@ export default function Navbar() {
           <img
             src="/logo-nav.svg"
             alt="Femme Events"
+            decoding="async"
             className="h-8 w-auto transition-all duration-300"
             style={scrolled || menuOpen ? {} : { filter: "brightness(0) invert(1)" }}
           />
