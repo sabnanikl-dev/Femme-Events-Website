@@ -76,6 +76,8 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
       <motion.img
         src={service.image}
         alt={service.alt}
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover object-center"
         animate={{ scale: hovered ? 1.06 : 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
