@@ -29,7 +29,7 @@ const steps = [
 
 export default function Process() {
   return (
-    <section className="py-24 px-6 md:px-24 bg-femme-cream overflow-hidden">
+    <section className="py-16 md:py-24 px-6 md:px-24 bg-femme-cream overflow-hidden">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -38,7 +38,7 @@ export default function Process() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="mb-20"
       >
-        <h2 className="text-8xl md:text-9xl text-femme-dark italic mb-4">
+        <h2 className="text-6xl md:text-8xl lg:text-9xl text-femme-dark italic mb-4">
           What Happens Next
         </h2>
         <div className="h-1 w-32 bg-femme-orange" />
@@ -98,7 +98,7 @@ export default function Process() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-        className="mt-20 flex items-center gap-6"
+        className="mt-16 md:mt-20 flex flex-col md:flex-row md:items-center gap-4 md:gap-6"
       >
         <a
           href="#inquiry"

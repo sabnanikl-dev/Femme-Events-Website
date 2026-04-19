@@ -158,10 +158,10 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
 
 export default function Services() {
   return (
-    <section id="services" className="py-24 px-6 md:px-24 bg-femme-lavender">
+    <section id="services" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender">
       {/* Header */}
       <div className="mb-16">
-        <h2 className="text-8xl md:text-9xl text-femme-dark mb-4 italic font-bold">
+        <h2 className="text-6xl md:text-8xl lg:text-9xl text-femme-dark mb-4 italic font-bold">
           Services That Save Sanity
         </h2>
         <div className="h-1 w-32 bg-femme-orange" />

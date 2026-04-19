@@ -125,7 +125,7 @@ export default function BlogIndex() {
             <p className="text-femme-plum text-sm uppercase tracking-widest font-bold font-system mb-3">
               Femme Events
             </p>
-            <h1 className="text-8xl md:text-9xl text-femme-dark italic leading-none mb-4">
+            <h1 className="text-7xl md:text-8xl lg:text-9xl text-femme-dark italic leading-none mb-4">
               The Journal
             </h1>
             <div className="h-1 w-32 bg-femme-orange" />

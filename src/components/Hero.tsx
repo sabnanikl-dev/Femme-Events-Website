@@ -56,32 +56,32 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.6 }}
-        className="absolute bottom-10 left-0 right-0 z-10 px-10 md:px-16 flex justify-between items-end text-white flex-wrap gap-6"
+        className="absolute bottom-6 md:bottom-10 left-0 right-0 z-10 px-6 md:px-16 grid grid-cols-2 md:flex md:justify-between md:items-end text-white gap-x-4 gap-y-5 md:gap-6"
       >
-        <div className="flex flex-col gap-2">
-          <span className="text-xs uppercase tracking-widest opacity-75">Location</span>
-          <span className="text-xl font-medium drop-shadow-md">Atlanta, GA</span>
+        <div className="flex flex-col gap-1.5 md:gap-2">
+          <span className="text-[10px] md:text-xs uppercase tracking-widest opacity-75">Location</span>
+          <span className="text-base md:text-xl font-medium drop-shadow-md">Atlanta, GA</span>
         </div>
-        <div className="flex flex-col gap-2 text-center">
-          <span className="text-xs uppercase tracking-widest opacity-75">Email</span>
-          <span className="text-xl font-medium drop-shadow-md">
+        <div className="flex flex-col gap-1.5 md:gap-2 text-right md:text-center">
+          <span className="text-[10px] md:text-xs uppercase tracking-widest opacity-75">Email</span>
+          <span className="text-sm md:text-xl font-medium drop-shadow-md break-all md:break-normal">
             Amanda<span style={{ fontFamily: 'system-ui, sans-serif' }}>@</span>FemmeEvents.com
           </span>
         </div>
-        <div className="flex flex-col gap-2 text-center">
-          <span className="text-xs uppercase tracking-widest opacity-75">Instagram</span>
+        <div className="flex flex-col gap-1.5 md:gap-2 md:text-center">
+          <span className="text-[10px] md:text-xs uppercase tracking-widest opacity-75">Instagram</span>
           <a
             href="https://www.instagram.com/_femmeevents/?hl=en"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xl font-medium drop-shadow-md hover:opacity-70 transition-opacity duration-200"
+            className="text-base md:text-xl font-medium drop-shadow-md hover:opacity-70 transition-opacity duration-200"
           >
             <span style={{ fontFamily: 'system-ui, sans-serif' }}>@_</span>femmeevents
           </a>
         </div>
-        <div className="flex flex-col gap-2 text-right">
-          <span className="text-xs uppercase tracking-widest opacity-75">Phone</span>
-          <span className="text-xl font-medium drop-shadow-md" style={{ fontFamily: 'system-ui, sans-serif' }}>(678) 644-5257</span>
+        <div className="flex flex-col gap-1.5 md:gap-2 text-right">
+          <span className="text-[10px] md:text-xs uppercase tracking-widest opacity-75">Phone</span>
+          <span className="text-base md:text-xl font-medium drop-shadow-md" style={{ fontFamily: 'system-ui, sans-serif' }}>(678) 644-5257</span>
         </div>
       </motion.div>
     </section>

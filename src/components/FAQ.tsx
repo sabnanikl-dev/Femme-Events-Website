@@ -80,8 +80,8 @@ function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
 
 export default function FAQ() {
   return (
-    <section className="py-24 px-6 md:px-24 bg-femme-pale">
-      <div className="grid md:grid-cols-2 gap-16 items-start">
+    <section className="py-16 md:py-24 px-6 md:px-24 bg-femme-pale">
+      <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
         {/* Left: heading */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -90,7 +90,7 @@ export default function FAQ() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="md:sticky md:top-32"
         >
-          <h2 className="text-7xl md:text-8xl text-femme-dark italic leading-tight mb-4">
+          <h2 className="text-5xl md:text-8xl text-femme-dark italic leading-tight mb-4">
             Questions We Actually Get Asked
           </h2>
           <div className="h-1 w-32 bg-femme-orange mb-6" />

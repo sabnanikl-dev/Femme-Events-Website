@@ -40,7 +40,7 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
-    <section className="py-24 px-6 md:px-24 bg-femme-pale">
+    <section className="py-16 md:py-24 px-6 md:px-24 bg-femme-pale">
       {/* Header row with arrow */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -50,7 +50,7 @@ export default function Testimonials() {
         className="mb-16 flex items-end justify-between gap-8"
       >
         <div>
-          <h2 className="text-8xl md:text-9xl text-femme-dark italic mb-4">
+          <h2 className="text-6xl md:text-8xl lg:text-9xl text-femme-dark italic mb-4">
             Kind Words
           </h2>
           <div className="h-1 w-32 bg-femme-orange" />
@@ -58,7 +58,7 @@ export default function Testimonials() {
       </motion.div>
 
       {/* Cards + arrow */}
-      <div className="flex items-center gap-6">
+      <div className="flex flex-col md:flex-row md:items-center gap-6">
         <div className="grid md:grid-cols-3 gap-8 flex-1">
         {testimonials.map((t, index) => (
           <motion.div
@@ -107,7 +107,7 @@ export default function Testimonials() {
           transition={{ type: "spring", stiffness: 300, damping: 18 }}
           className="shrink-0 w-14 h-14 rounded-full border-2 border-femme-plum text-femme-plum
             flex items-center justify-center hover:bg-femme-plum hover:text-white
-            transition-colors duration-200 cursor-pointer"
+            transition-colors duration-200 cursor-pointer self-end md:self-auto"
           aria-label="Next testimonials"
         >
           <ArrowRight size={22} strokeWidth={2} />

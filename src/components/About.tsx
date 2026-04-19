@@ -2,13 +2,13 @@ import { motion } from "motion/react";
 
 export default function About() {
   return (
-    <section id="about" className="py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-[2fr_3fr] gap-16 items-center">
+    <section id="about" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-[2fr_3fr] gap-12 md:gap-16 items-center">
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative w-4/5 ml-auto"
+        className="relative w-full md:w-4/5 md:ml-auto"
       >
         <img
           src="/photos/pt2.jpg"
@@ -24,7 +24,7 @@ export default function About() {
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="flex flex-col gap-8"
       >
-        <h2 className="text-7xl md:text-8xl text-femme-dark leading-tight italic">
+        <h2 className="text-5xl md:text-8xl text-femme-dark leading-tight italic">
           Why We Obsess Over&nbsp;"I Do"
         </h2>
         <p className="text-femme-dark/80 text-2xl leading-relaxed max-w-lg">
