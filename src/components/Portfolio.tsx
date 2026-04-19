@@ -56,7 +56,7 @@ export default function Portfolio() {
   const visible = active === "All" ? weddings : weddings.filter((w) => w.tier === active);
 
   return (
-    <section id="portfolio" className="py-24 px-6 md:px-24 bg-femme-cream">
+    <section id="portfolio" className="py-16 md:py-24 px-6 md:px-24 bg-femme-cream">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -65,7 +65,7 @@ export default function Portfolio() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="mb-12"
       >
-        <h2 className="text-8xl md:text-9xl text-femme-dark italic mb-4">
+        <h2 className="text-6xl md:text-8xl lg:text-9xl text-femme-dark italic mb-4">
           Real Weddings
         </h2>
         <div className="h-1 w-32 bg-femme-orange" />

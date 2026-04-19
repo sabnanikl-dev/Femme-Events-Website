@@ -91,7 +91,7 @@ function VendorCard({ vendor, index }: { vendor: Vendor; index: number }) {
 
 export default function Vendors() {
   return (
-    <section className="py-24 px-6 md:px-24 bg-femme-cream">
+    <section className="py-16 md:py-24 px-6 md:px-24 bg-femme-cream">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -100,7 +100,7 @@ export default function Vendors() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="mb-16"
       >
-        <h2 className="text-8xl md:text-9xl text-femme-dark italic mb-4">
+        <h2 className="text-6xl md:text-8xl lg:text-9xl text-femme-dark italic mb-4">
           Our People
         </h2>
         <p className="text-femme-dark/60 text-lg font-system max-w-xl">
