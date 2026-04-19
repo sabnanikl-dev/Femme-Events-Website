@@ -26,12 +26,48 @@ export default function Navbar() {
     setMenuOpen(false);
   }, [pathname]);
 
+  // Close the mobile panel if the viewport widens into the desktop range
+  // (panel becomes md:hidden — leaving it "open" would orphan the scroll lock).
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setMenuOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   useEffect(() => {
     if (!menuOpen) return;
+
+    const getFocusable = (): HTMLElement[] => {
+      const links = panelRef.current
+        ? Array.from(panelRef.current.querySelectorAll<HTMLElement>("a"))
+        : [];
+      return toggleRef.current ? [toggleRef.current, ...links] : links;
+    };
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setMenuOpen(false);
         toggleRef.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusable = getFocusable();
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (active && !focusable.includes(active)) {
+        e.preventDefault();
+        first.focus();
       }
     };
     const prevOverflow = document.body.style.overflow;
