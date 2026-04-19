@@ -138,17 +138,19 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
           </p>
         </div>
 
-        {/* Book Now button */}
-        <motion.button
+        {/* Book Now button — links to inquiry section */}
+        <motion.a
+          href="#inquiry"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full py-3.5 text-sm font-bold uppercase tracking-widest font-system
+          aria-label={`Book ${service.title} — jump to inquiry form`}
+          className="block w-full py-3.5 text-sm font-bold uppercase tracking-widest font-system text-center
             bg-transparent border-2 border-white/70 text-white
             hover:bg-femme-plum hover:border-femme-plum
-            transition-colors duration-200 cursor-pointer rounded-sm"
+            transition-colors duration-200 cursor-pointer rounded-sm no-underline"
         >
           Book Now
-        </motion.button>
+        </motion.a>
       </div>
     </motion.div>
   );
