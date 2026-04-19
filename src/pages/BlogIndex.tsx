@@ -12,7 +12,7 @@ function FeaturedPost({ post }: { post: Post }) {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className="grid md:grid-cols-[40%_60%] gap-0 rounded-2xl overflow-hidden border border-femme-plum/10 shadow-sm"
+      className="grid md:grid-cols-[28%_72%] gap-0 rounded-2xl overflow-hidden border border-femme-plum/10 shadow-sm"
     >
       {/* Image */}
       <div className="overflow-hidden aspect-[4/3] md:aspect-auto">
@@ -62,7 +62,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
       className="group flex flex-col gap-4 border-b border-femme-plum/10 pb-10"
     >
       {/* Image */}
-      <div className="overflow-hidden rounded-xl aspect-[16/7.2]">
+      <div className="overflow-hidden rounded-xl aspect-[16/5.04]">
         <img
           src={post.image}
           alt={post.title}
