@@ -12,7 +12,7 @@ function FeaturedPost({ post }: { post: Post }) {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className="grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden border border-femme-plum/10 shadow-sm"
+      className="grid md:grid-cols-[28%_72%] gap-0 rounded-2xl overflow-hidden border border-femme-plum/10 shadow-sm"
     >
       {/* Image */}
       <div className="overflow-hidden aspect-[4/3] md:aspect-auto">
@@ -32,11 +32,11 @@ function FeaturedPost({ post }: { post: Post }) {
           <span className="text-xs text-femme-dark/40">{post.date}</span>
         </div>
 
-        <h2 className="text-4xl md:text-5xl text-femme-dark leading-tight italic">
+        <h2 className="text-[2.475rem] md:text-[3.3rem] text-femme-dark leading-tight italic">
           {post.title}
         </h2>
 
-        <p className="text-femme-dark/65 text-lg leading-relaxed font-system">
+        <p className="text-femme-dark/65 text-[1.2375rem] leading-relaxed font-system">
           {post.excerpt}
         </p>
 
@@ -62,7 +62,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
       className="group flex flex-col gap-4 border-b border-femme-plum/10 pb-10"
     >
       {/* Image */}
-      <div className="overflow-hidden rounded-xl aspect-[16/9]">
+      <div className="overflow-hidden rounded-xl aspect-[16/5.04]">
         <img
           src={post.image}
           alt={post.title}
@@ -82,12 +82,12 @@ function PostCard({ post, index }: { post: Post; index: number }) {
       </div>
 
       {/* Title */}
-      <h3 className="text-2xl text-femme-dark leading-snug group-hover:text-femme-plum transition-colors duration-200">
+      <h3 className="text-[1.65rem] text-femme-dark leading-snug group-hover:text-femme-plum transition-colors duration-200">
         {post.title}
       </h3>
 
       {/* Excerpt */}
-      <p className="text-femme-dark/60 text-base leading-relaxed font-system line-clamp-2 flex-1">
+      <p className="text-femme-dark/60 text-[1.1rem] leading-relaxed font-system line-clamp-2 flex-1">
         {post.excerpt}
       </p>
 
