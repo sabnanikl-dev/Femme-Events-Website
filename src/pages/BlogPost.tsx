@@ -3,7 +3,7 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowLeft } from "lucide-react";
 import { PortableText, type PortableTextComponents } from "@portabletext/react";
-import { getInitialPost, getPost, type Post } from "../lib/posts";
+import { getInitialPost, getPost, formatPostDate, type Post } from "../lib/posts";
 
 // Custom serializers so Portable Text output matches the visual style of
 // the existing markdown-ish renderer (italic h2, plum-dot bullets, etc.).
@@ -150,7 +150,7 @@ export default function BlogPost() {
             <span className="text-femme-dark/30">·</span>
             <span className="text-xs text-femme-dark/50">{post.readTime}</span>
             <span className="text-femme-dark/30">·</span>
-            <span className="text-xs text-femme-dark/50">{post.date}</span>
+            <span className="text-xs text-femme-dark/50">{formatPostDate(post.date)}</span>
           </div>
           <h1 className="text-5xl md:text-6xl text-femme-dark leading-tight italic mb-4">
             {post.title}
