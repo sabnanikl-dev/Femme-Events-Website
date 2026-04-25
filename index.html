@@ -9,8 +9,20 @@
     <meta name="description" content="Femme Events is an Atlanta-based wedding coordination and design studio offering day-of coordination, partial planning, and full design packages. Serving Atlanta, GA and surrounding areas." />
     <link rel="canonical" href="https://femmeevents.com/" />
 
+    <!-- Mobile / PWA -->
+    <meta name="theme-color" content="#831654" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Femme Events" />
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/logo-nav.svg" />
+
+    <!-- Preload above-the-fold display fonts. The Seasons (body) is omitted —
+         font-display: swap already covers it with system fallbacks. -->
+    <link rel="preload" href="/fonts/frunchy-sage.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="/fonts/balgin-display-regular.otf" as="font" type="font/otf" crossorigin />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
