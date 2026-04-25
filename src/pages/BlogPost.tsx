@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowLeft } from "lucide-react";
-import { getPost } from "../data/posts";
+import { getInitialPost, getPost, type Post } from "../lib/posts";
 
 function renderBody(body: string) {
   return body.split("\n\n").map((block, i) => {
@@ -38,9 +39,24 @@ function renderBody(body: string) {
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
-  const post = getPost(slug ?? "");
+  // undefined = still loading (Sanity path); null = loaded, not found.
+  const [post, setPost] = useState<Post | null | undefined>(() =>
+    slug ? getInitialPost(slug) : null,
+  );
 
-  if (!post) return <Navigate to="/journal" replace />;
+  useEffect(() => {
+    if (!slug) return;
+    let cancelled = false;
+    getPost(slug).then((data) => {
+      if (!cancelled) setPost(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug]);
+
+  if (post === undefined) return null;
+  if (post === null) return <Navigate to="/journal" replace />;
 
   return (
     <div className="min-h-screen bg-femme-cream">

@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight } from "lucide-react";
-import { posts, type Post } from "../data/posts";
-
-const categories = ["All", ...Array.from(new Set(posts.map((p) => p.category)))];
+import { getInitialPosts, getPosts, type Post } from "../lib/posts";
 
 function FeaturedPost({ post }: { post: Post }) {
   return (
@@ -108,6 +106,33 @@ function PostCard({ post, index }: { post: Post; index: number }) {
 
 export default function BlogIndex() {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [posts, setPosts] = useState<Post[] | null>(getInitialPosts);
+
+  useEffect(() => {
+    let cancelled = false;
+    getPosts().then((data) => {
+      if (!cancelled) setPosts(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const categories = useMemo(
+    () =>
+      posts
+        ? ["All", ...Array.from(new Set(posts.map((p) => p.category)))]
+        : ["All"],
+    [posts],
+  );
+
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="min-h-screen bg-femme-cream pt-40 px-6 md:px-24">
+        <p className="text-femme-dark/40 font-system">Loading the journal…</p>
+      </div>
+    );
+  }
 
   const featured = posts[0];
   const rest = posts.slice(1);

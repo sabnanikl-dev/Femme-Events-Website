@@ -13,6 +13,7 @@
   "dependencies": {
     "@google/genai": "^1.29.0",
     "@radix-ui/react-slot": "^1.2.4",
+    "@sanity/client": "^7.22.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "class-variance-authority": "^0.7.1",

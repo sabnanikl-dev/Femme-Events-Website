@@ -1,0 +1,23 @@
+{
+  "name": "femme-events-studio",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Sanity Studio for the Femme Events journal. Deployed separately to femmeevents.sanity.studio.",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy"
+  },
+  "dependencies": {
+    "@sanity/vision": "^3.50.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "sanity": "^3.50.0",
+    "styled-components": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "typescript": "^5.5.0"
+  }
+}
