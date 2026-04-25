@@ -1,7 +1,13 @@
+import type { PortableTextBlock } from "@portabletext/react";
 import { sanityClient } from "./sanity";
-import { posts as fallbackPosts, type Post } from "../data/posts";
+import { posts as fallbackPosts, type Post as FallbackPost } from "../data/posts";
 
-export type { Post };
+// Wider runtime type than the static fallback — Sanity returns Portable
+// Text blocks for `body`, the static posts use a markdown-ish string.
+// Both are renderable by BlogPost.tsx; the renderer branches on shape.
+export interface Post extends Omit<FallbackPost, "body"> {
+  body: string | PortableTextBlock[];
+}
 
 const POSTS_QUERY = `*[_type == "post"] | order(date desc){
   "slug": slug.current,

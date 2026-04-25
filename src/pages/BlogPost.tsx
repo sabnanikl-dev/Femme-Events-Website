@@ -2,9 +2,50 @@ import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowLeft } from "lucide-react";
+import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import { getInitialPost, getPost, type Post } from "../lib/posts";
 
-function renderBody(body: string) {
+// Custom serializers so Portable Text output matches the visual style of
+// the existing markdown-ish renderer (italic h2, plum-dot bullets, etc.).
+const portableTextComponents: PortableTextComponents = {
+  block: {
+    h2: ({ children }) => (
+      <h2 className="text-3xl text-femme-dark mt-10 mb-4 italic">{children}</h2>
+    ),
+    normal: ({ children }) => (
+      <p className="text-femme-dark/80 text-lg leading-relaxed font-system">
+        {children}
+      </p>
+    ),
+  },
+  list: {
+    bullet: ({ children }) => (
+      <ul className="flex flex-col gap-2 my-4 pl-2">{children}</ul>
+    ),
+  },
+  listItem: {
+    bullet: ({ children }) => (
+      <li className="flex gap-3 items-start font-system text-femme-dark/80 text-lg leading-relaxed">
+        <span className="w-1.5 h-1.5 rounded-full bg-femme-plum shrink-0 mt-[10px]" />
+        <span>{children}</span>
+      </li>
+    ),
+  },
+  marks: {
+    link: ({ value, children }) => (
+      <a
+        href={value?.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-femme-plum hover:opacity-70 transition-opacity"
+      >
+        {children}
+      </a>
+    ),
+  },
+};
+
+function renderMarkdownBody(body: string) {
   return body.split("\n\n").map((block, i) => {
     if (block.startsWith("## ")) {
       return (
@@ -35,6 +76,11 @@ function renderBody(body: string) {
       </p>
     );
   });
+}
+
+function renderBody(body: Post["body"]) {
+  if (typeof body === "string") return renderMarkdownBody(body);
+  return <PortableText value={body} components={portableTextComponents} />;
 }
 
 export default function BlogPost() {
