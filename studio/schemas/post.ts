@@ -33,6 +33,8 @@ export const post = defineType({
       options: {
         list: [
           { title: "Planning", value: "Planning" },
+          { title: "Venues", value: "Venues" },
+          { title: "Services", value: "Services" },
           { title: "Real Weddings", value: "Real Weddings" },
           { title: "Vendors", value: "Vendors" },
           { title: "Inspiration", value: "Inspiration" },
@@ -51,6 +53,7 @@ export const post = defineType({
       title: "Read Time",
       type: "string",
       description: 'e.g. "5 min read"',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "image",
@@ -65,6 +68,7 @@ export const post = defineType({
       type: "array",
       of: [{ type: "block" }],
       description: "Rich text body of the post.",
+      validation: (Rule) => Rule.required().min(1),
     }),
   ],
   preview: {
