@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight } from "lucide-react";
-import { getInitialPosts, getPosts, type Post } from "../lib/posts";
+import { getInitialPosts, getPosts, formatPostDate, type Post } from "../lib/posts";
 
 function FeaturedPost({ post }: { post: Post }) {
   return (
@@ -29,7 +29,7 @@ function FeaturedPost({ post }: { post: Post }) {
           <span className="text-xs font-bold uppercase tracking-widest text-femme-plum bg-femme-plum/10 px-3 py-1 rounded-full">
             {post.category}
           </span>
-          <span className="text-xs text-femme-dark/40">{post.date}</span>
+          <span className="text-xs text-femme-dark/40">{formatPostDate(post.date)}</span>
         </div>
 
         <h2 className="text-[2.475rem] md:text-[3.3rem] text-femme-dark leading-tight italic">
@@ -80,7 +80,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
         <span className="text-femme-dark/25">·</span>
         <span className="text-xs text-femme-dark/45">{post.readTime}</span>
         <span className="text-femme-dark/25">·</span>
-        <span className="text-xs text-femme-dark/45">{post.date}</span>
+        <span className="text-xs text-femme-dark/45">{formatPostDate(post.date)}</span>
       </div>
 
       {/* Title */}
