@@ -51,18 +51,28 @@ export const vendor = defineType({
       description:
         "Order within the category. Lower numbers appear first; leave blank to sort alphabetically.",
     }),
+    defineField({
+      name: "image",
+      title: "Photo",
+      type: "image",
+      options: { hotspot: true },
+      description:
+        "Optional vendor photo shown in the Our People detail overlay. Square crops work best; use the hotspot tool to set the focal point.",
+    }),
   ],
   preview: {
     select: {
       title: "name",
       subtitle: "category.label",
       published: "published",
+      media: "image",
     },
-    prepare({ title, subtitle, published }) {
+    prepare({ title, subtitle, published, media }) {
       const visibility = published === false ? " (hidden)" : "";
       return {
         title: `${title}${visibility}`,
         subtitle: subtitle ?? "Uncategorized",
+        media,
       };
     },
   },
