@@ -3,8 +3,17 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { getInitialPosts, getPosts, formatPostDate, type Post } from "../lib/posts";
+import {
+  buildSrcSet,
+  parseSanityDimensions,
+  sanityImageUrl,
+} from "../lib/imageUrl";
+
+const FEATURED_WIDTHS = [400, 600, 800, 1200, 1600];
+const CARD_WIDTHS = [400, 600, 800, 1200];
 
 function FeaturedPost({ post }: { post: Post }) {
+  const dims = parseSanityDimensions(post.image);
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
@@ -15,7 +24,11 @@ function FeaturedPost({ post }: { post: Post }) {
       {/* Image */}
       <div className="overflow-hidden aspect-[4/3] md:aspect-auto">
         <img
-          src={post.image}
+          src={sanityImageUrl(post.image, { w: 1200 })}
+          srcSet={buildSrcSet(post.image, FEATURED_WIDTHS)}
+          sizes="(min-width: 768px) 30vw, 100vw"
+          width={dims?.width}
+          height={dims?.height}
           alt={post.title}
           fetchPriority="high"
           decoding="async"
@@ -52,6 +65,7 @@ function FeaturedPost({ post }: { post: Post }) {
 }
 
 function PostCard({ post, index }: { post: Post; index: number }) {
+  const dims = parseSanityDimensions(post.image);
   return (
     <motion.article
       layout
@@ -64,7 +78,11 @@ function PostCard({ post, index }: { post: Post; index: number }) {
       {/* Image */}
       <div className="overflow-hidden rounded-xl aspect-[16/5.04]">
         <img
-          src={post.image}
+          src={sanityImageUrl(post.image, { w: 800 })}
+          srcSet={buildSrcSet(post.image, CARD_WIDTHS)}
+          sizes="(min-width: 768px) 45vw, 100vw"
+          width={dims?.width}
+          height={dims?.height}
           alt={post.title}
           loading="lazy"
           decoding="async"
