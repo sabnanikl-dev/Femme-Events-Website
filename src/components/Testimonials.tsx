@@ -7,6 +7,8 @@ import {
   type Testimonial,
 } from "../lib/testimonials";
 import { testimonials as fallbackTestimonials } from "../data/testimonials";
+import { useCarouselIndex } from "../lib/useCarouselIndex";
+import CarouselDots from "./CarouselDots";
 
 function Name({ children }: { children: string }) {
   const parts = children.split("&");
@@ -39,6 +41,10 @@ export default function Testimonials() {
     };
   }, []);
 
+  const { ref, index, scrollToIndex } = useCarouselIndex<HTMLDivElement>(
+    testimonials.length,
+  );
+
   return (
     <section className="py-16 md:py-24 px-6 md:px-24 bg-femme-pale">
       {/* Header row with arrow */}
@@ -59,60 +65,85 @@ export default function Testimonials() {
 
       {/* Cards + arrow */}
       <div className="flex flex-col md:flex-row md:items-center gap-6">
-        <div className="grid md:grid-cols-3 gap-8 flex-1">
-        {testimonials.map((t, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            whileHover={{ y: -8 }}
-            transition={{ delay: index * 0.15, duration: 0.5, type: "spring", stiffness: 280, damping: 20 }}
-            className="bg-femme-cream border border-femme-pink/40 p-8 flex flex-col gap-6 rounded-2xl shadow-sm cursor-default"
-          >
-            {/* Decorative quote mark */}
-            <span
-              className="text-8xl leading-none text-femme-plum/20 select-none"
-              style={{ fontFamily: "Frunchy Sage, serif", fontWeight: "bold" }}
-              aria-hidden="true"
+        {/* Mobile: horizontal scroll. Desktop: 3-col grid. */}
+        <div
+          ref={ref}
+          className="flex md:grid md:grid-cols-3 gap-8 flex-1
+            overflow-x-auto md:overflow-visible
+            snap-x snap-mandatory md:snap-none
+            scrollbar-hide
+            -mx-6 md:mx-0 px-6 md:px-0
+            pb-2 md:pb-0"
+        >
+          {testimonials.map((t, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -8 }}
+              transition={{
+                delay: i * 0.15,
+                duration: 0.5,
+                type: "spring",
+                stiffness: 280,
+                damping: 20,
+              }}
+              className="shrink-0 w-[85vw] md:w-auto snap-start md:snap-align-none
+                bg-femme-cream border border-femme-pink/40 p-8 flex flex-col gap-6 rounded-2xl shadow-sm cursor-default"
             >
-              "
-            </span>
-
-            {/* Quote */}
-            <p className="text-femme-dark/85 text-lg leading-relaxed flex-grow -mt-6">
-              {t.quote}
-            </p>
-
-            {/* Divider */}
-            <div className="h-px bg-femme-pink/40" />
-
-            {/* Attribution */}
-            <div className="flex flex-col gap-2 items-center text-center">
-              <span className="text-femme-plum text-3xl font-bold font-balgin">
-                <Name>{t.name}</Name>
+              {/* Decorative quote mark */}
+              <span
+                className="text-8xl leading-none text-femme-plum/20 select-none"
+                style={{ fontFamily: "Frunchy Sage, serif", fontWeight: "bold" }}
+                aria-hidden="true"
+              >
+                "
               </span>
-              <span className="text-femme-dark/50 text-sm font-system">
-                {t.detail}
-              </span>
-            </div>
-          </motion.div>
-        ))}
+
+              {/* Quote */}
+              <p className="text-femme-dark/85 text-lg leading-relaxed flex-grow -mt-6">
+                {t.quote}
+              </p>
+
+              {/* Divider */}
+              <div className="h-px bg-femme-pink/40" />
+
+              {/* Attribution */}
+              <div className="flex flex-col gap-2 items-center text-center">
+                <span className="text-femme-plum text-3xl font-bold font-balgin">
+                  <Name>{t.name}</Name>
+                </span>
+                <span className="text-femme-dark/50 text-sm font-system">
+                  {t.detail}
+                </span>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
-        {/* Next arrow — centered with cards, after the last one */}
+        {/* Next arrow — desktop only (mobile uses swipe + dots) */}
         <motion.button
           whileHover={{ x: 4 }}
           whileTap={{ scale: 0.93 }}
           transition={{ type: "spring", stiffness: 300, damping: 18 }}
-          className="shrink-0 w-14 h-14 rounded-full border-2 border-femme-plum text-femme-plum
-            flex items-center justify-center hover:bg-femme-plum hover:text-white
-            transition-colors duration-200 cursor-pointer self-end md:self-auto"
+          className="hidden md:flex shrink-0 w-14 h-14 rounded-full border-2 border-femme-plum text-femme-plum
+            items-center justify-center hover:bg-femme-plum hover:text-white
+            transition-colors duration-200 cursor-pointer self-auto"
           aria-label="Next testimonials"
         >
           <ArrowRight size={22} strokeWidth={2} />
         </motion.button>
       </div>
+
+      {/* Mobile-only dot indicators */}
+      <CarouselDots
+        count={testimonials.length}
+        activeIndex={index}
+        onSelect={scrollToIndex}
+        label="Testimonials"
+        className="mt-6 md:hidden"
+      />
     </section>
   );
 }
