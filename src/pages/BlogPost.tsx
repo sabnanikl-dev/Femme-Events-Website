@@ -4,6 +4,13 @@ import { motion } from "motion/react";
 import { ArrowLeft } from "lucide-react";
 import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import { getInitialPost, getPost, formatPostDate, type Post } from "../lib/posts";
+import {
+  buildSrcSet,
+  parseSanityDimensions,
+  sanityImageUrl,
+} from "../lib/imageUrl";
+
+const HERO_WIDTHS = [600, 900, 1200, 1600, 2000];
 
 // Custom serializers so Portable Text output matches the visual style of
 // the existing markdown-ish renderer (italic h2, plum-dot bullets, etc.).
@@ -104,12 +111,18 @@ export default function BlogPost() {
   if (post === undefined) return null;
   if (post === null) return <Navigate to="/journal" replace />;
 
+  const heroDims = parseSanityDimensions(post.image);
+
   return (
     <div className="min-h-screen bg-femme-cream">
       {/* Hero image */}
       <div className="relative h-[55vh] w-full overflow-hidden">
         <img
-          src={post.image}
+          src={sanityImageUrl(post.image, { w: 1600 })}
+          srcSet={buildSrcSet(post.image, HERO_WIDTHS)}
+          sizes="100vw"
+          width={heroDims?.width}
+          height={heroDims?.height}
           alt={post.title}
           fetchPriority="high"
           decoding="async"
