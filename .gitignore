@@ -3,3 +3,6 @@ node_modules/
 *.log
 dist/
 .env
+
+# Playwright MCP review artifacts (console logs + page snapshots)
+.playwright-mcp/
