@@ -16,7 +16,8 @@ const VENDORS_QUERY = `*[_type == "vendorCategory"] | order(coalesce(order, 9999
     "name": name,
     "specialty": specialty,
     "url": websiteUrl,
-    "instagram": instagramHandle
+    "instagram": instagramHandle,
+    "image": image.asset->url
   }
 }`;
 
