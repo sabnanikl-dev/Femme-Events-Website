@@ -41,7 +41,13 @@ export function useCarouselIndex<T extends HTMLElement = HTMLDivElement>(
     if (!el) return;
     const card = el.children[i] as HTMLElement | undefined;
     if (!card) return;
-    el.scrollTo({ left: card.offsetLeft - el.offsetLeft, behavior: "smooth" });
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    el.scrollTo({
+      left: card.offsetLeft - el.offsetLeft,
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
   };
 
   return { ref, index, scrollToIndex };
