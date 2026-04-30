@@ -3,6 +3,7 @@ export interface Vendor {
   specialty: string;
   url?: string;
   instagram?: string;
+  image?: string;
 }
 
 export interface VendorCategory {

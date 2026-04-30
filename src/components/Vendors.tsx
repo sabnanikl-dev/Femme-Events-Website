@@ -1,26 +1,48 @@
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
-import { ExternalLink, Instagram } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   getInitialVendorCategories,
   getVendorCategories,
-  instagramUrl,
   type Vendor,
   type VendorCategory,
 } from "../lib/vendors";
 import { vendorCategories as fallbackCategories } from "../data/vendors";
+import VendorOverlayCard from "./ui/VendorOverlayCard";
 
-function VendorCard({ vendor, index }: { vendor: Vendor; index: number }) {
-  const igLink = instagramUrl(vendor.instagram);
-  const websiteLink = vendor.url && vendor.url !== "#" ? vendor.url : null;
+interface SelectedVendor {
+  vendor: Vendor;
+  category: string;
+}
 
+function VendorCard({
+  vendor,
+  index,
+  onOpen,
+}: {
+  vendor: Vendor;
+  index: number;
+  onOpen: () => void;
+}) {
   return (
     <motion.li
       initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.06, duration: 0.4, ease: "easeOut" }}
-      className="group flex items-center justify-between gap-3 bg-femme-cream/60 border border-femme-pink/30 px-5 py-3.5 rounded-xl hover:bg-femme-cream transition-colors duration-200"
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Open ${vendor.name} details`}
+      className="group flex items-center justify-between gap-3 bg-femme-cream/60 border border-femme-pink/30 px-5 py-3.5 rounded-xl
+        hover:bg-femme-cream hover:border-femme-plum/40 transition-colors duration-200
+        cursor-pointer
+        focus:outline-none focus:ring-2 focus:ring-femme-orange focus:ring-offset-2 focus:ring-offset-femme-cream"
     >
       <div className="flex flex-col gap-0.5 min-w-0">
         <span className="text-femme-dark text-base font-balgin truncate">
@@ -30,34 +52,6 @@ function VendorCard({ vendor, index }: { vendor: Vendor; index: number }) {
           {vendor.specialty}
         </span>
       </div>
-      {(websiteLink || igLink) && (
-        <div className="shrink-0 flex items-center gap-2">
-          {websiteLink && (
-            <a
-              href={websiteLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-7 h-7 rounded-full border border-femme-plum/40 text-femme-plum flex items-center justify-center
-                opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-femme-plum hover:text-white transition-all duration-200"
-              aria-label={`Visit ${vendor.name} website`}
-            >
-              <ExternalLink size={13} strokeWidth={2} />
-            </a>
-          )}
-          {igLink && (
-            <a
-              href={igLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-7 h-7 rounded-full border border-femme-plum/40 text-femme-plum flex items-center justify-center
-                opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-femme-plum hover:text-white transition-all duration-200"
-              aria-label={`${vendor.name} on Instagram`}
-            >
-              <Instagram size={13} strokeWidth={2} />
-            </a>
-          )}
-        </div>
-      )}
     </motion.li>
   );
 }
@@ -67,6 +61,7 @@ export default function Vendors() {
     () => getInitialVendorCategories() ?? fallbackCategories,
   );
   const [errored, setErrored] = useState(false);
+  const [selected, setSelected] = useState<SelectedVendor | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,7 +116,14 @@ export default function Vendors() {
               </h3>
               <ul className="flex flex-col gap-3">
                 {cat.vendors.map((vendor, i) => (
-                  <VendorCard key={vendor.name} vendor={vendor} index={i} />
+                  <VendorCard
+                    key={vendor.name}
+                    vendor={vendor}
+                    index={i}
+                    onOpen={() =>
+                      setSelected({ vendor, category: cat.label })
+                    }
+                  />
                 ))}
               </ul>
             </motion.div>
@@ -156,6 +158,21 @@ export default function Vendors() {
           Ask Us
         </a>
       </motion.div>
+
+      <AnimatePresence>
+        {selected && (
+          <VendorOverlayCard
+            key={`${selected.category}-${selected.vendor.name}`}
+            name={selected.vendor.name}
+            specialty={selected.vendor.specialty}
+            category={selected.category}
+            image={selected.vendor.image}
+            url={selected.vendor.url}
+            instagram={selected.vendor.instagram}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }
