@@ -108,6 +108,17 @@
   z-index: 1;
 }
 
+/* ─── Scrollbar Hide ───────────────────────────── */
+/* For horizontal mobile carousels — keeps the swipe gesture
+   without showing a scrollbar that breaks the visual rhythm. */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* ─── Reduced Motion ───────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import CarouselDots from "./CarouselDots";
+import { useCarouselIndex } from "../lib/useCarouselIndex";
 
 const services = [
   {
@@ -59,7 +61,37 @@ const addons = [
   "Second coordinator",
 ];
 
-function ServiceCard({ service, index }: { service: typeof services[0]; index: number }) {
+function IncludesList({
+  service,
+}: {
+  service: (typeof services)[0];
+}) {
+  return (
+    <ul className="flex flex-col gap-2 mb-6">
+      {service.includes.map((item, i) => (
+        <li key={i} className="flex gap-2.5 items-start">
+          <span className="w-1.5 h-1.5 rounded-full bg-femme-pink shrink-0 mt-[6px]" />
+          <span className="text-white/90 text-sm leading-snug font-system">
+            {item}
+          </span>
+        </li>
+      ))}
+      {service.note && (
+        <li className="text-white/50 text-xs italic pl-4 font-system mt-1">
+          {service.note}
+        </li>
+      )}
+    </ul>
+  );
+}
+
+function ServiceCard({
+  service,
+  index,
+}: {
+  service: (typeof services)[0];
+  index: number;
+}) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -68,7 +100,7 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
-      className="relative h-[700px] rounded-2xl overflow-hidden cursor-pointer shadow-xl"
+      className="relative shrink-0 w-[85vw] md:w-auto h-[640px] md:h-[700px] snap-start md:snap-align-none rounded-2xl overflow-hidden cursor-pointer shadow-xl"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -86,56 +118,48 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
       {/* Base gradient — always visible at bottom */}
       <div className="absolute inset-0 bg-gradient-to-t from-femme-dark/90 via-femme-dark/30 to-transparent" />
 
-      {/* Hover overlay — deepens the gradient */}
+      {/* Hover overlay — desktop only, deepens the gradient */}
       <motion.div
-        className="absolute inset-0 bg-femme-dark/40"
+        className="absolute inset-0 bg-femme-dark/40 hidden md:block"
         animate={{ opacity: hovered ? 1 : 0 }}
         transition={{ duration: 0.4 }}
       />
 
+      {/* Mobile static overlay so the always-visible includes stay legible */}
+      <div className="absolute inset-0 bg-femme-dark/30 md:hidden" />
+
       {/* Card content */}
       <div className="absolute inset-0 flex flex-col justify-end p-8">
+        {/* Mobile: includes always visible — no hover state on touch */}
+        <div className="md:hidden">
+          <IncludesList service={service} />
+        </div>
 
-        {/* Bullet list — slides up on hover */}
+        {/* Desktop: includes slide up on hover */}
         <AnimatePresence>
           {hovered && (
-            <motion.ul
+            <motion.div
+              key="includes"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 16 }}
               transition={{ duration: 0.35, ease: "easeOut" }}
-              className="flex flex-col gap-2 mb-6"
+              className="hidden md:block"
             >
-              {service.includes.map((item, i) => (
-                <motion.li
-                  key={i}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04, duration: 0.3 }}
-                  className="flex gap-2.5 items-start"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-femme-pink shrink-0 mt-[6px]" />
-                  <span className="text-white/90 text-sm leading-snug font-system">{item}</span>
-                </motion.li>
-              ))}
-              {service.note && (
-                <li className="text-white/50 text-xs italic pl-4 font-system mt-1">{service.note}</li>
-              )}
-            </motion.ul>
+              <IncludesList service={service} />
+            </motion.div>
           )}
         </AnimatePresence>
 
         {/* Title block — always visible */}
         <div className="mb-5">
           <h3
-            className="text-white text-6xl leading-tight mb-2"
+            className="text-white text-5xl md:text-6xl leading-tight mb-2"
             style={{ fontFamily: "Frunchy Sage, serif", fontWeight: "bold" }}
           >
             {service.title}
           </h3>
-          <p
-            className="text-femme-pink text-sm uppercase tracking-[0.25em] font-bold font-system"
-          >
+          <p className="text-femme-pink text-sm uppercase tracking-[0.25em] font-bold font-system">
             {service.subtitle}
           </p>
         </div>
@@ -159,6 +183,10 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
 }
 
 export default function Services() {
+  const { ref, index, scrollToIndex } = useCarouselIndex<HTMLDivElement>(
+    services.length,
+  );
+
   return (
     <section id="services" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender">
       {/* Header */}
@@ -169,12 +197,31 @@ export default function Services() {
         <div className="h-1 w-32 bg-femme-orange" />
       </div>
 
-      {/* Service Cards */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {services.map((service, index) => (
-          <ServiceCard key={index} service={service} index={index} />
+      {/* Service Cards: horizontal scroll on mobile, grid on desktop.
+          The negative margin lets cards flow to the screen edge while
+          the section keeps its px-6 padding for everything else. */}
+      <div
+        ref={ref}
+        className="flex md:grid md:grid-cols-3 gap-6
+          overflow-x-auto md:overflow-visible
+          snap-x snap-mandatory md:snap-none
+          scrollbar-hide
+          -mx-6 md:mx-0 px-6 md:px-0
+          pb-2 md:pb-0"
+      >
+        {services.map((service, i) => (
+          <ServiceCard key={i} service={service} index={i} />
         ))}
       </div>
+
+      {/* Mobile-only dot indicators */}
+      <CarouselDots
+        count={services.length}
+        activeIndex={index}
+        onSelect={scrollToIndex}
+        label="Service packages"
+        className="mt-6 md:hidden"
+      />
 
       {/* À La Carte Add-ons */}
       <motion.div
