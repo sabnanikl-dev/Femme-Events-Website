@@ -1,5 +1,12 @@
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
+import {
+  getInitialTestimonials,
+  getTestimonials,
+  type Testimonial,
+} from "../lib/testimonials";
+import { testimonials as fallbackTestimonials } from "../data/testimonials";
 
 function Name({ children }: { children: string }) {
   const parts = children.split("&");
@@ -17,28 +24,21 @@ function Name({ children }: { children: string }) {
   );
 }
 
-const testimonials = [
-  {
-    quote:
-      "Amanda made our day feel effortless. Every tiny detail we obsessed over for months just appeared — perfectly. We didn't lift a finger and somehow it was better than anything we'd imagined.",
-    name: "Priscila & Tri",
-    detail: "Atlanta, GA · Full Coordination + Design",
-  },
-  {
-    quote:
-      "Hiring Femme Events for day-of coordination was the best decision we made. Amanda kept everything moving without us ever feeling the pressure. Our guests still talk about how smooth it all was.",
-    name: "Kaitlyn & James",
-    detail: "Roswell, GA · Day-of Coordination",
-  },
-  {
-    quote:
-      "We were DIY-ing everything and totally overwhelmed. The partial planning package was exactly what we needed — vendor recommendations, mood boards, budget help. She got us across the finish line with our sanity intact.",
-    name: "Maya & Devon",
-    detail: "Decatur, GA · Partial Planning",
-  },
-];
-
 export default function Testimonials() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(
+    () => getInitialTestimonials() ?? fallbackTestimonials,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    getTestimonials().then((data) => {
+      if (!cancelled && data.length > 0) setTestimonials(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section className="py-16 md:py-24 px-6 md:px-24 bg-femme-pale">
       {/* Header row with arrow */}
