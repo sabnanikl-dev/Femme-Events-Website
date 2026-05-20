@@ -50,7 +50,7 @@ export function FramerCarousel({ items }: FramerCarouselProps) {
       <div className="relative overflow-hidden rounded-2xl" ref={containerRef}>
         <motion.div className="flex" style={{ x }}>
           {items.map((item) => (
-            <div key={item.id} className="shrink-0 w-full h-[750px] relative bg-femme-dark rounded-2xl">
+            <div key={item.id} className="shrink-0 w-full h-[520px] md:h-[720px] relative bg-femme-dark rounded-2xl">
               <img
                 src={item.url}
                 alt={`${item.couple} — ${item.detail}`}

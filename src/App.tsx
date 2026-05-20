@@ -12,6 +12,7 @@ import About from "./components/About";
 import Services from "./components/Services";
 import Process from "./components/Process";
 import Testimonials from "./components/Testimonials";
+import Portfolio from "./components/Portfolio";
 import Vendors from "./components/Vendors";
 import FAQ from "./components/FAQ";
 import Inquiry from "./components/Inquiry";
@@ -29,6 +30,7 @@ function Home() {
       <Services />
       <Process />
       <Testimonials />
+      <Portfolio />
       <Vendors />
       <FAQ />
       <Inquiry />
