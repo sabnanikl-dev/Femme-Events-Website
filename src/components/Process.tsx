@@ -1,4 +1,6 @@
 import { motion } from "motion/react";
+import CarouselDots from "./CarouselDots";
+import { useCarouselIndex } from "../lib/useCarouselIndex";
 
 const steps = [
   {
@@ -28,6 +30,10 @@ const steps = [
 ];
 
 export default function Process() {
+  const { ref, index, scrollToIndex } = useCarouselIndex<HTMLDivElement>(
+    steps.length,
+  );
+
   return (
     <section className="py-16 md:py-24 px-6 md:px-24 bg-femme-cream overflow-hidden">
       {/* Header */}
@@ -52,7 +58,19 @@ export default function Process() {
         {/* Connecting line — desktop only */}
         <div className="hidden md:block absolute top-10 left-0 right-0 h-px bg-femme-plum/15 z-0" />
 
-        <div className="grid md:grid-cols-4 gap-10 md:gap-6 relative z-10">
+        {/* Mobile: horizontal snap-scroll, one step + a peek of the next.
+            Desktop (md+): unchanged 4-column grid. The negative margin lets
+            cards reach the screen edge while the section keeps its padding. */}
+        <div
+          ref={ref}
+          className="flex md:grid md:grid-cols-4 gap-6
+            overflow-x-auto md:overflow-visible
+            snap-x snap-mandatory md:snap-none
+            scrollbar-hide
+            -mx-6 md:mx-0 px-6 md:px-0
+            pb-2 md:pb-0
+            relative z-10"
+        >
           {steps.map((step, index) => (
             <motion.div
               key={index}
@@ -60,19 +78,13 @@ export default function Process() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
-              className="flex flex-col gap-5"
+              className="flex flex-col gap-5 shrink-0 w-[85vw] md:w-auto snap-start md:snap-align-none"
             >
               {/* Number badge */}
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-full border-2 border-femme-plum flex items-center justify-center shrink-0 bg-femme-cream">
-                  <span
-                    className="text-femme-plum text-2xl font-bold font-system"
-                  >
-                    {step.number}
-                  </span>
-                </div>
-                {/* Mobile connector line */}
-                <div className="md:hidden flex-1 h-px bg-femme-plum/15" />
+              <div className="w-20 h-20 rounded-full border-2 border-femme-plum flex items-center justify-center shrink-0 bg-femme-cream">
+                <span className="text-femme-plum text-2xl font-bold font-system">
+                  {step.number}
+                </span>
               </div>
 
               {/* Label */}
@@ -91,6 +103,15 @@ export default function Process() {
           ))}
         </div>
       </div>
+
+      {/* Mobile-only step indicators */}
+      <CarouselDots
+        count={steps.length}
+        activeIndex={index}
+        onSelect={scrollToIndex}
+        label="Planning steps"
+        className="mt-6 md:hidden"
+      />
 
       {/* Bottom CTA nudge */}
       <motion.div
