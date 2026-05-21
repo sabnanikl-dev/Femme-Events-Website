@@ -12,7 +12,6 @@ import About from "./components/About";
 import Services from "./components/Services";
 import Process from "./components/Process";
 import Testimonials from "./components/Testimonials";
-import Portfolio from "./components/Portfolio";
 import Vendors from "./components/Vendors";
 import FAQ from "./components/FAQ";
 import Inquiry from "./components/Inquiry";
@@ -21,6 +20,7 @@ import Inquiry from "./components/Inquiry";
 // blog code on first load.
 const BlogIndex = lazy(() => import("./pages/BlogIndex"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const WhatHappensNextPage = lazy(() => import("./pages/WhatHappensNext"));
 
 function Home() {
   return (
@@ -30,7 +30,6 @@ function Home() {
       <Services />
       <Process />
       <Testimonials />
-      <Portfolio />
       <Vendors />
       <FAQ />
       <Inquiry />
@@ -45,6 +44,7 @@ export default function App() {
       <Suspense fallback={<div className="min-h-screen bg-femme-cream" />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/what-happens-next" element={<WhatHappensNextPage />} />
           <Route path="/journal" element={<BlogIndex />} />
           <Route path="/journal/:slug" element={<BlogPost />} />
         </Routes>

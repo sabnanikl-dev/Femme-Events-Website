@@ -10,43 +10,43 @@ const filters: Tier[] = ["All", "Full Femme", "Partial", "Day-Of"];
 const weddings: (CarouselItem & { tier: Tier })[] = [
   {
     id: 1,
-    url: "/photos/amanda-2026/amanda-wedding-01.jpg",
-    couple: "Real Femme Wedding",
+    url: "/photos/pt.jpg",
+    couple: "Priscila & Tri",
     location: "Atlanta, GA",
     tier: "Full Femme",
-    detail: "Planning details + wedding-day support",
+    detail: "Full Coordination + Design",
   },
   {
     id: 2,
-    url: "/photos/amanda-2026/amanda-wedding-02.jpg",
-    couple: "Real Femme Wedding",
+    url: "/photos/pt2.jpg",
+    couple: "Priscila & Tri",
     location: "Atlanta, GA",
     tier: "Full Femme",
-    detail: "Ceremony and reception coordination",
+    detail: "Full Coordination + Design",
   },
   {
     id: 3,
-    url: "/photos/amanda-2026/amanda-wedding-03.jpg",
-    couple: "Real Femme Wedding",
+    url: "/photos/pt3.jpg",
+    couple: "Priscila & Tri",
     location: "Atlanta, GA",
-    tier: "Partial",
-    detail: "Timeline, vendor alignment, and details",
+    tier: "Full Femme",
+    detail: "Full Coordination + Design",
   },
   {
     id: 4,
-    url: "/photos/amanda-2026/amanda-wedding-04.jpg",
-    couple: "Real Femme Wedding",
-    location: "Atlanta, GA",
+    url: "/photos/kj1.jpg",
+    couple: "Kaitlyn & James",
+    location: "Roswell, GA",
     tier: "Day-Of",
-    detail: "Wedding-day management",
+    detail: "Day-of Coordination",
   },
   {
     id: 5,
-    url: "/photos/amanda-2026/amanda-wedding-05.jpg",
-    couple: "Real Femme Wedding",
-    location: "Atlanta, GA",
+    url: "/photos/kj2.jpg",
+    couple: "Kaitlyn & James",
+    location: "Roswell, GA",
     tier: "Day-Of",
-    detail: "End-to-end celebration support",
+    detail: "Day-of Coordination",
   },
 ];
 
@@ -56,7 +56,8 @@ export default function Portfolio() {
   const visible = active === "All" ? weddings : weddings.filter((w) => w.tier === active);
 
   return (
-    <section id="portfolio" className="py-16 md:py-24 px-6 md:px-24 bg-femme-pale/60">
+    <section id="portfolio" className="py-16 md:py-24 px-6 md:px-24 bg-femme-cream">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -68,11 +69,12 @@ export default function Portfolio() {
           Real Weddings
         </h2>
         <div className="h-1 w-32 bg-femme-orange" />
-        <p className="mt-6 text-femme-dark/60 text-xl font-system max-w-2xl">
-          A few moments from Amanda’s latest wedding gallery — proof that calm logistics and pretty details can absolutely coexist.
+        <p className="mt-6 text-femme-dark/60 text-xl font-system max-w-xl">
+          Every wedding is different. Here's proof.
         </p>
       </motion.div>
 
+      {/* Filter pills */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -83,7 +85,6 @@ export default function Portfolio() {
         {filters.map((filter) => (
           <button
             key={filter}
-            type="button"
             onClick={() => setActive(filter)}
             className={`px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-widest font-system transition-colors duration-200 cursor-pointer border ${
               active === filter
@@ -96,6 +97,7 @@ export default function Portfolio() {
         ))}
       </motion.div>
 
+      {/* Carousel */}
       <AnimatePresence mode="wait">
         <motion.div
           key={active}
