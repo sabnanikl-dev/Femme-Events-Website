@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import CarouselDots from "./CarouselDots";
 import { useCarouselIndex } from "../lib/useCarouselIndex";
+import { trackEvent } from "../lib/analytics";
 
 const steps = [
   {
@@ -123,6 +124,7 @@ export default function Process() {
       >
         <a
           href="#inquiry"
+          onClick={() => trackEvent("cta_inquiry_click", { location: "process" })}
           className="inline-block bg-femme-plum text-white px-10 py-4 rounded-full font-bold text-sm uppercase tracking-widest shadow-md hover:bg-femme-dark transition-colors duration-200 font-system"
         >
           Start Your Journey

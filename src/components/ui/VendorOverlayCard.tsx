@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { ExternalLink, Instagram, X } from "lucide-react";
 import { instagramUrl } from "../../lib/vendors";
+import { trackEvent } from "../../lib/analytics";
 
 interface VendorOverlayCardProps {
   name: string;
@@ -147,6 +148,7 @@ export default function VendorOverlayCard({
                 href={websiteLink}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("vendor_link_click", { type: "website", vendor: name })}
                 className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full
                   bg-femme-plum text-white text-sm font-bold uppercase tracking-widest font-system
                   hover:bg-femme-deep transition-colors duration-200
@@ -161,6 +163,7 @@ export default function VendorOverlayCard({
                 href={igLink}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent("vendor_link_click", { type: "instagram", vendor: name })}
                 className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full
                   bg-femme-pale text-femme-plum text-sm font-bold uppercase tracking-widest font-system
                   border border-femme-plum/20

@@ -1,3 +1,5 @@
+import { trackEvent } from "../lib/analytics";
+
 export default function Footer() {
   return (
     <footer className="py-10 px-6 md:px-24 bg-femme-pale border-t border-femme-plum/10">
@@ -23,12 +25,14 @@ export default function Footer() {
           <div className="text-base leading-relaxed font-system">
             <a
               href="mailto:amanda@femmeevents.com"
+              onClick={() => trackEvent("email_click", { location: "footer" })}
               className="hover:text-femme-plum transition-colors duration-200 block"
             >
               amanda@femmeevents.com
             </a>
             <a
               href="tel:6786445257"
+              onClick={() => trackEvent("phone_click", { location: "footer" })}
               className="hover:text-femme-plum transition-colors duration-200 block mt-1"
             >
               (678) 644-5257
@@ -37,6 +41,7 @@ export default function Footer() {
               href="https://instagram.com/_femmeevents"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent("instagram_click", { location: "footer" })}
               className="hover:text-femme-plum transition-colors duration-200 block mt-1"
             >
               @_femmeevents

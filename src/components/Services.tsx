@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import CarouselDots from "./CarouselDots";
 import { useCarouselIndex } from "../lib/useCarouselIndex";
+import { trackEvent } from "../lib/analytics";
 
 const services = [
   {
@@ -167,6 +168,7 @@ function ServiceCard({
         {/* Book Now button — links to inquiry section */}
         <motion.a
           href="#inquiry"
+          onClick={() => trackEvent("cta_inquiry_click", { location: "service_card", service: service.title })}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           aria-label={`Book ${service.title} — jump to inquiry form`}
