@@ -44,8 +44,17 @@ export function useCarouselIndex<T extends HTMLElement = HTMLDivElement>(
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
+    // Center the target card in the scrollport so dot navigation lands on
+    // the same position a swipe produces with `scroll-snap-align: center`.
+    // `offsetLeft` is measured from the shared offset parent, so subtracting
+    // the container's own offset yields the card's left edge within the
+    // scroll content; the half-leftover term then centers it. Clamp to the
+    // valid scroll range so the first/last cards don't try to overscroll.
+    const center =
+      card.offsetLeft - el.offsetLeft - (el.clientWidth - card.clientWidth) / 2;
+    const maxScroll = el.scrollWidth - el.clientWidth;
     el.scrollTo({
-      left: card.offsetLeft - el.offsetLeft,
+      left: Math.max(0, Math.min(center, maxScroll)),
       behavior: prefersReducedMotion ? "auto" : "smooth",
     });
   };

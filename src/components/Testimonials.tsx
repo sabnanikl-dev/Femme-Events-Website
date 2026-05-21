@@ -62,14 +62,17 @@ export default function Testimonials() {
         </div>
       </motion.div>
 
-      {/* Mobile: horizontal scroll. Desktop: 3-col grid. */}
+      {/* Mobile: horizontal scroll. Desktop: 3-col grid.
+          Symmetric 7.5vw inset (= (100vw - 85vw card)/2) keeps the
+          snap-centered card balanced in the viewport on mobile; the
+          negative margin lets cards reach the screen edge. */}
       <div
         ref={ref}
         className="flex md:grid md:grid-cols-3 gap-8
           overflow-x-auto md:overflow-visible
           snap-x snap-mandatory md:snap-none
           scrollbar-hide
-          -mx-6 md:mx-0 px-6 md:px-0
+          -mx-6 md:mx-0 px-[7.5vw] md:px-0
           pb-2 md:pb-0"
       >
         {testimonials.map((t, i) => (
@@ -86,7 +89,7 @@ export default function Testimonials() {
               stiffness: 280,
               damping: 20,
             }}
-            className="shrink-0 w-[85vw] md:w-auto snap-start md:snap-align-none
+            className="shrink-0 w-[85vw] md:w-auto snap-center md:snap-align-none
               bg-femme-cream border border-femme-pink/40 p-8 flex flex-col gap-6 rounded-2xl shadow-sm cursor-default"
           >
             {/* Decorative quote mark */}

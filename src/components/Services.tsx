@@ -100,7 +100,7 @@ function ServiceCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
-      className="relative shrink-0 w-[85vw] md:w-auto h-[640px] md:h-[700px] snap-start md:snap-align-none rounded-2xl overflow-hidden cursor-pointer shadow-xl"
+      className="relative shrink-0 w-[85vw] md:w-auto h-[640px] md:h-[700px] snap-center md:snap-align-none rounded-2xl overflow-hidden cursor-pointer shadow-xl"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -198,15 +198,17 @@ export default function Services() {
       </div>
 
       {/* Service Cards: horizontal scroll on mobile, grid on desktop.
-          The negative margin lets cards flow to the screen edge while
-          the section keeps its px-6 padding for everything else. */}
+          The negative margin lets cards flow to the screen edge; the
+          symmetric 7.5vw inset (= (100vw - 85vw card)/2) keeps the
+          snap-centered card balanced in the viewport on mobile. Desktop
+          resets to the section's own padding via md:px-0. */}
       <div
         ref={ref}
         className="flex md:grid md:grid-cols-3 gap-6
           overflow-x-auto md:overflow-visible
           snap-x snap-mandatory md:snap-none
           scrollbar-hide
-          -mx-6 md:mx-0 px-6 md:px-0
+          -mx-6 md:mx-0 px-[7.5vw] md:px-0
           pb-2 md:pb-0"
       >
         {services.map((service, i) => (
