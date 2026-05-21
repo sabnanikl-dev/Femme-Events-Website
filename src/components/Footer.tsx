@@ -15,7 +15,7 @@ export default function Footer() {
 
         <div className="flex flex-col gap-2">
           <h4 className="text-sm uppercase tracking-[0.2em] font-bold opacity-40">Location</h4>
-          <p className="text-base text-femme-dark/80">Serving Atlanta and surrounding areas</p>
+          <p className="text-base text-femme-dark/80">Atlanta, GA</p>
         </div>
 
         <div className="flex flex-col gap-2">

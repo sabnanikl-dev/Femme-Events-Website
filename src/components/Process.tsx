@@ -106,6 +106,12 @@ export default function Process() {
         >
           Start Your Journey
         </a>
+        <a
+          href="/what-happens-next"
+          className="text-femme-plum text-sm font-system uppercase tracking-widest font-bold hover:text-femme-dark transition-colors duration-200"
+        >
+          Already booked? See the full planning flow
+        </a>
         <span className="text-femme-dark/40 text-sm font-system uppercase tracking-widest">
           Free consultation · No commitment
         </span>

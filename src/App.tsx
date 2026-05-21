@@ -20,6 +20,7 @@ import Inquiry from "./components/Inquiry";
 // blog code on first load.
 const BlogIndex = lazy(() => import("./pages/BlogIndex"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const WhatHappensNextPage = lazy(() => import("./pages/WhatHappensNext"));
 
 function Home() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
       <Suspense fallback={<div className="min-h-screen bg-femme-cream" />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/what-happens-next" element={<WhatHappensNextPage />} />
           <Route path="/journal" element={<BlogIndex />} />
           <Route path="/journal/:slug" element={<BlogPost />} />
         </Routes>
