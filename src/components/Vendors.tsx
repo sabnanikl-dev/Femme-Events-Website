@@ -39,7 +39,7 @@ function VendorCard({
       role="button"
       tabIndex={0}
       aria-label={`Open ${vendor.name} details`}
-      className="group flex items-center justify-between gap-3 bg-femme-cream/60 border border-femme-pink/30 px-5 py-3.5 rounded-xl
+      className="group flex w-full max-w-full box-border items-center justify-between gap-3 bg-femme-cream/60 border border-femme-pink/30 px-5 py-3.5 rounded-xl
         hover:bg-femme-cream hover:border-femme-plum/40 transition-colors duration-200
         cursor-pointer
         focus:outline-none focus:ring-2 focus:ring-femme-orange focus:ring-offset-2 focus:ring-offset-femme-cream"
@@ -101,7 +101,7 @@ export default function Vendors() {
 
       {/* Category Grid */}
       {categories.length > 0 ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-[minmax(0,1fr)] md:grid-cols-2 lg:grid-cols-3 gap-10 min-w-0">
           {categories.map((cat, catIndex) => (
             <motion.div
               key={cat.label}
@@ -109,12 +109,13 @@ export default function Vendors() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: catIndex * 0.1, duration: 0.5, ease: "easeOut" }}
+              className="min-w-0"
             >
               <h3 className="text-2xl text-femme-plum font-balgin mb-4 flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-femme-orange shrink-0" />
                 {cat.label}
               </h3>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-3 min-w-0 max-w-full">
                 {cat.vendors.map((vendor, i) => (
                   <VendorCard
                     key={vendor.name}
