@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 
 export default function About() {
   return (
-    <section id="about" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-[2fr_3fr] gap-12 md:gap-16 items-center">
+    <section id="about" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-[2fr_3fr] gap-12 md:gap-16 items-center overflow-x-clip">
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         whileInView={{ opacity: 1, x: 0 }}
