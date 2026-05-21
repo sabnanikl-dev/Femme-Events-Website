@@ -4,8 +4,10 @@ import {
   type Vendor,
   type VendorCategory,
 } from "../data/vendors";
+import { getMergedVendorCategories as mergeVendorCategories } from "./vendorMerge";
 
 export type { Vendor, VendorCategory };
+export { getMergedVendorCategories } from "./vendorMerge";
 
 // Fetch each category and inline only its published vendors. Categories
 // with zero published vendors are filtered out client-side so the grid
@@ -29,8 +31,7 @@ export async function getVendorCategories(): Promise<VendorCategory[]> {
   if (!sanityClient) return fallbackCategories;
   try {
     const result = await sanityClient.fetch<VendorCategory[]>(VENDORS_QUERY);
-    const populated = result.filter((c) => c.vendors.length > 0);
-    return populated.length > 0 ? populated : fallbackCategories;
+    return mergeVendorCategories(result, fallbackCategories);
   } catch {
     return fallbackCategories;
   }
