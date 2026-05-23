@@ -27,7 +27,7 @@ const faqs = [
   {
     question: "Can I customize my package?",
     answer:
-      "Absolutely. Every wedding is different, and we're not big on one-size-fits-all. Our à la carte add-ons (rehearsal dinner coordination, welcome party, extra coordinators, and more) let you tailor any package to exactly what you need. Tell us your situation and we'll build something that fits.",
+      "Absolutely. Every wedding is different, and we're not big on one-size-fits-all. Our à la carte add-ons (rehearsal dinner coordination, welcome party coordination, and more) let you tailor any package to exactly what you need. Tell us your situation and we'll build something that fits.",
   },
   {
     question: "How does pricing work?",

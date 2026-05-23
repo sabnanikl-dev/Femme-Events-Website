@@ -82,9 +82,9 @@ At Femme Events, our day-of package includes:
 - Full vendor contact collection and timeline distribution
 - A day-of timeline we build from scratch (not a template)
 - Rehearsal coordination the evening before
-- Two coordinators on the actual day, for eight hours
+- All-day wedding management on the wedding day
 
-That last part matters. One coordinator cannot be in the bridal suite and at the venue entrance at the same time. You need two.
+That last part matters. No single person can be in the bridal suite and at the venue entrance at the same time, so we staff the day to keep every moving piece covered from setup through send-off.
 
 ## What it doesn't include
 
