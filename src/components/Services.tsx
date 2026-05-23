@@ -174,15 +174,23 @@ function ServiceCard({
         </div>
 
         {/* Book Now button — carries the selected package to the inquiry form.
-            The real href keeps right-click/open-in-new-tab and no-JS fallback
-            working; the click handler does a client-side navigation so visitors
-            don't pay for a full reload, then ScrollToHash scrolls to #inquiry. */}
+            The real href keeps no-JS fallback and modified-click (open in new
+            tab/window) working; a plain left-click does a client-side navigation
+            instead so visitors don't pay for a full reload. */}
         <motion.a
           href={inquiryHref}
           onClick={(e) => {
+            // Let the browser handle modified clicks via the real href so
+            // Cmd/Ctrl/Shift-click still opens the form in a new tab/window.
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
             e.preventDefault();
             trackEvent("cta_inquiry_click", { location: "service_card", service: service.title });
             navigate(inquiryHref);
+            // Scroll explicitly: switching packages while already at #inquiry is
+            // a search-only URL change, so ScrollToHash (keyed on pathname/hash)
+            // won't re-fire. The section always exists on the home page, and
+            // the global scroll-padding-top keeps it clear of the navbar.
+            document.getElementById("inquiry")?.scrollIntoView();
           }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
