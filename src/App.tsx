@@ -21,6 +21,7 @@ import Inquiry from "./components/Inquiry";
 const BlogIndex = lazy(() => import("./pages/BlogIndex"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const WhatHappensNextPage = lazy(() => import("./pages/WhatHappensNext"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
 
 function Home() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
       <Suspense fallback={<div className="min-h-screen bg-femme-cream" />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/what-happens-next" element={<WhatHappensNextPage />} />
           <Route path="/journal" element={<BlogIndex />} />
           <Route path="/journal/:slug" element={<BlogPost />} />
