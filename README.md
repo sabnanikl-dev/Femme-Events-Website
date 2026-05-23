@@ -1,20 +1,60 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Femme Events Website
 
-# Run and deploy your AI Studio app
+Marketing site for **Femme Events** — an Atlanta-based wedding coordination and
+design studio. Built with React + TypeScript on Vite, styled with Tailwind CSS,
+with journal/blog, testimonials, and vendor content served from Sanity CMS
+(with static fallbacks).
 
-This contains everything you need to run your app locally.
+## Tech stack
 
-View your app in AI Studio: https://ai.studio/apps/707f1579-a1a9-40d4-a68f-18db90b9c323
+- React 19 + TypeScript (strict)
+- Vite 6 build tooling
+- Tailwind CSS v4
+- React Router
+- Sanity CMS (`studio/`) for journal, testimonials, and vendors
+- Formspree for inquiry-form submissions
 
-## Run Locally
+## Run locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:** Node.js 18+
 
+```bash
+npm install
+npm run dev      # starts Vite on http://localhost:3000
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Other scripts:
+
+```bash
+npm run build    # production build to dist/
+npm run preview  # preview the production build
+npm run lint     # tsc --noEmit typecheck
+```
+
+## Environment variables
+
+Copy `.env.example` to `.env` and fill in the values. All are `VITE_`-prefixed
+and read in the browser, so none are secrets. The same values must be set in the
+Vercel project (Production + Preview).
+
+| Variable | Purpose |
+|----------|---------|
+| `VITE_FORMSPREE_ENDPOINT` | Inquiry form submission endpoint |
+| `VITE_SANITY_PROJECT_ID` | Sanity project ID (unset → static fallback content) |
+| `VITE_SANITY_DATASET` | Sanity dataset (default `production`) |
+| `VITE_SANITY_API_VERSION` | Sanity API version (default `2024-01-01`) |
+| `VITE_PLAUSIBLE_DOMAIN` / `VITE_GA4_MEASUREMENT_ID` | Optional analytics (see `docs/analytics.md`) |
+
+## Project layout
+
+- `src/` — application code (components, pages, data, lib)
+- `components/ui/` — shared UI primitives reachable via the `@` alias
+- `public/` — static assets served as-is (fonts, photos, logos)
+- `studio/` — Sanity Studio (CMS) source, deployed separately
+- `docs/` — analytics and local-development notes
+
+## Contributing
+
+All work follows the multi-agent process in **`AGENTS.md`**: every change traces
+to a GitHub Issue, lands on a branch, and is cross-reviewed before merge. Read
+`AGENTS.md` before making changes.
