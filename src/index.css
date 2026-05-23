@@ -121,7 +121,7 @@
   height: 100%;
   opacity: 0.05;
   pointer-events: none;
-  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  background-image: url("/noise.svg");
   z-index: 1;
 }
 
