@@ -19,7 +19,8 @@ export async function getTestimonials(): Promise<Testimonial[]> {
   if (!sanityClient) return fallbackTestimonials;
   try {
     const result = await sanityClient.fetch<Testimonial[]>(TESTIMONIALS_QUERY);
-    // Empty CMS = use fallback so the section never renders blank.
+    // Empty CMS falls back to the static list (currently empty). When both are
+    // empty the section hides itself rather than showing placeholder reviews.
     return result.length > 0 ? result : fallbackTestimonials;
   } catch {
     return fallbackTestimonials;
