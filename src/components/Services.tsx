@@ -192,21 +192,24 @@ export default function Services() {
   return (
     <section id="services" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender">
       {/* Header */}
-      <div className="mb-16 max-w-4xl">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl text-femme-dark mb-6 italic font-bold leading-tight">
+      <div className="mb-16">
+        <h2 className="text-5xl md:text-8xl text-femme-dark leading-tight italic mb-6">
           For the look, the feeling, and every moving piece in between.
         </h2>
         <div className="h-1 w-32 bg-femme-orange mb-8" />
-        <p className="text-femme-dark/70 text-base md:text-lg font-system leading-relaxed mb-4">
-          Femme Events is for couples who know what they want the wedding to
-          feel like, even if they need help turning the Pinterest boards, vendor
-          emails, family opinions, and tiny moving pieces into an actual plan.
-        </p>
-        <p className="text-femme-dark/70 text-base md:text-lg font-system leading-relaxed">
-          We do not believe in “this is how it’s always done.” We believe in
-          your way, your energy, your people, and a planning process that feels
-          safe, clear, and completely supported.
-        </p>
+        <div className="max-w-3xl">
+          <p className="text-femme-dark/70 text-base md:text-lg font-system leading-relaxed mb-4">
+            Femme Events is for couples who know what they want the wedding to
+            feel like, even if they need help turning the Pinterest boards,
+            vendor emails, family opinions, and tiny moving pieces into an actual
+            plan.
+          </p>
+          <p className="text-femme-dark/70 text-base md:text-lg font-system leading-relaxed">
+            We do not believe in “this is how it’s always done.” We believe in
+            your way, your energy, your people, and a planning process that feels
+            safe, clear, and completely supported.
+          </p>
+        </div>
       </div>
 
       {/* Service Cards: horizontal scroll on mobile, grid on desktop.
