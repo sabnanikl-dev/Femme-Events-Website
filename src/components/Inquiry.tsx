@@ -96,6 +96,29 @@ export default function Inquiry() {
   /* ──────────── Normal form ──────────── */
   return (
     <section id="inquiry" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16">
+      {/* Audience / differentiator — confidence block before the form (Issue #87) */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="md:col-span-2 max-w-3xl mx-auto text-center"
+      >
+        <p className="text-femme-dark text-3xl md:text-4xl italic font-display leading-tight mb-8">
+          You belong here if you want the wedding to feel like you, not like a
+          checklist someone handed you.
+        </p>
+        <p className="text-femme-dark/70 text-base md:text-lg font-system leading-relaxed mb-8">
+          Bring us the disco balls, the bows, the moody florals, the dramatic
+          dress change, the sentimental ceremony, the different little detail
+          nobody else understands, the hyper-feminine fantasy, the alternative
+          mood board, the silly inside joke, the “is this too much?” idea.
+        </p>
+        <p className="text-femme-plum text-2xl md:text-3xl italic font-display">
+          It is not too much. It is the point.
+        </p>
+      </motion.div>
+
       <div className="flex flex-col gap-6">
         <h2 className="text-6xl md:text-8xl text-femme-dark leading-[0.95] italic">
           Ready to Chat Dates &amp; Dreams?
