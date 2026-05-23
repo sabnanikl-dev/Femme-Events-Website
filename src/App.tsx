@@ -33,19 +33,31 @@ function ScrollToHash() {
   useEffect(() => {
     if (!hash) return;
     const id = hash.slice(1);
-    let raf = 0;
+    let timeout = 0;
     let attempts = 0;
     const scrollToTarget = () => {
       const el = document.getElementById(id);
       if (el) {
         el.scrollIntoView({ block: "start" });
+        requestAnimationFrame(() => el.scrollIntoView({ block: "start" }));
         return;
       }
-      if (attempts++ < 20) raf = requestAnimationFrame(scrollToTarget);
+      if (attempts++ < 50) timeout = window.setTimeout(scrollToTarget, 50);
     };
-    raf = requestAnimationFrame(scrollToTarget);
-    return () => cancelAnimationFrame(raf);
+    timeout = window.setTimeout(scrollToTarget, 0);
+    return () => window.clearTimeout(timeout);
   }, [pathname, hash]);
+  return null;
+}
+
+// Browser history keeps the current scroll position across SPA route changes.
+// Reset ordinary route navigations while leaving hash links to ScrollToHash.
+function ScrollToRouteTop() {
+  const { pathname, search, hash } = useLocation();
+  useEffect(() => {
+    if (hash) return;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname, search, hash]);
   return null;
 }
 
@@ -78,6 +90,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <RouteAnalytics />
+      <ScrollToRouteTop />
       <ScrollToHash />
       <Navbar />
       <Suspense fallback={<div className="min-h-screen bg-femme-cream" />}>

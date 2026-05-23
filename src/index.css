@@ -99,13 +99,15 @@
 }
 
 /* Keep decorative brand fonts from substituting ornamental glyphs for the few
-   symbols they distort, while staying close to the site's editorial serif. */
+   symbols they distort. */
 .font-symbol {
-  font-family: Baskerville, "Libre Baskerville", Georgia, "Times New Roman", serif;
-  font-size: 0.82em;
-  font-style: italic;
-  font-weight: 400;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.72em;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1;
   letter-spacing: 0;
+  vertical-align: 0.04em;
 }
 
 /* ─── Grain Texture ────────────────────────────── */

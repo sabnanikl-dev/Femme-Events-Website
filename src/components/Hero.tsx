@@ -67,9 +67,9 @@ export default function Hero() {
           <span className="text-[10px] md:text-xs uppercase tracking-widest opacity-75">Location</span>
           <span className="text-base md:text-xl font-medium drop-shadow-md">Atlanta, GA</span>
         </div>
-        <div className="flex flex-col gap-1.5 md:gap-2 text-right md:text-center">
+        <div className="flex min-w-0 flex-col gap-1.5 text-right md:gap-2 md:text-center">
           <span className="text-[10px] md:text-xs uppercase tracking-widest opacity-75">Email</span>
-          <span className="text-sm md:text-xl font-medium drop-shadow-md break-all md:break-normal font-system">
+          <span className="whitespace-nowrap text-[13px] font-medium drop-shadow-md md:text-xl font-system">
             Amanda@FemmeEvents.com
           </span>
         </div>

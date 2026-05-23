@@ -11,6 +11,11 @@ interface SanityImageOpts {
   fit?: "max" | "crop";
 }
 
+interface SanityHotspot {
+  x?: number;
+  y?: number;
+}
+
 export function isSanityUrl(url: string | undefined): url is string {
   return typeof url === "string" && url.includes(SANITY_HOST);
 }
@@ -57,4 +62,16 @@ export function parseSanityDimensions(
   const match = /-(\d+)x(\d+)\.[a-zA-Z0-9]+(?:\?|$)/.exec(url);
   if (!match) return null;
   return { width: Number(match[1]), height: Number(match[2]) };
+}
+
+export function imageObjectPosition(
+  fallbackPosition?: string,
+  hotspot?: SanityHotspot,
+): string | undefined {
+  if (hotspot?.x !== undefined && hotspot?.y !== undefined) {
+    const x = Math.min(100, Math.max(0, hotspot.x * 100));
+    const y = Math.min(100, Math.max(0, hotspot.y * 100));
+    return `${x.toFixed(2)}% ${y.toFixed(2)}%`;
+  }
+  return fallbackPosition;
 }

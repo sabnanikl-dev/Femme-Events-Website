@@ -6,6 +6,7 @@ export interface Post {
   date: string;
   readTime: string;
   image: string;
+  imagePosition?: string;
   body: string;
 }
 
@@ -19,6 +20,7 @@ export const posts: Post[] = [
     date: "April 10, 2026",
     readTime: "5 min read",
     image: "/photos/pt2.jpg",
+    imagePosition: "50% 56%",
     body: `
 Six months feels like forever — until it doesn't. If you're sitting at the six-month mark and your to-do list looks like a CVS receipt, take a breath. Not everything on it matters equally.
 
@@ -68,6 +70,7 @@ If you're not sure what your "right order" looks like — that's exactly what a 
     date: "March 28, 2026",
     readTime: "4 min read",
     image: "/photos/pt3.jpg",
+    imagePosition: "52% 72%",
     body: `
 The phrase "day-of coordination" is genuinely misleading. We've thought about lobbying to change the industry term. We haven't won that fight yet.
 
@@ -114,6 +117,7 @@ Not sure which package fits your situation? Fill out our inquiry form and we'll 
     date: "March 14, 2026",
     readTime: "6 min read",
     image: "/photos/kj1.jpg",
+    imagePosition: "50% 42%",
     body: `
 Venue tours are designed to make you fall in love. They happen on sunny days, rooms are staged perfectly, and your tour guide has done this hundreds of times. Their job is to sell.
 

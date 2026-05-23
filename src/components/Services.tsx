@@ -112,7 +112,7 @@ function ServiceCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
-      className={`relative shrink-0 w-[85vw] md:w-auto ${isFullFemme ? "h-[760px]" : "h-[640px]"} md:h-[700px] snap-center md:snap-align-none rounded-2xl overflow-hidden cursor-pointer shadow-xl`}
+      className="relative h-[700px] w-[85vw] shrink-0 snap-center overflow-hidden rounded-2xl shadow-xl cursor-pointer md:h-[700px] md:w-auto md:snap-align-none"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -141,7 +141,7 @@ function ServiceCard({
       <div className="absolute inset-0 bg-femme-dark/30 md:hidden" />
 
       {/* Card content */}
-      <div className="absolute inset-0 flex flex-col justify-end p-8">
+      <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
         {/* Mobile: includes always visible — no hover state on touch */}
         <div className="md:hidden">
           <IncludesList service={service} compact={isFullFemme} />
@@ -166,7 +166,7 @@ function ServiceCard({
         {/* Title block — always visible */}
         <div className="mb-5">
           <h3
-            className="text-white text-5xl md:text-6xl leading-tight mb-2"
+            className="mb-2 text-[2.85rem] leading-tight text-white md:text-6xl"
             style={{ fontFamily: "Frunchy Sage, serif", fontWeight: "bold" }}
           >
             <SafeText text={service.title} />
@@ -216,7 +216,7 @@ export default function Services() {
   );
 
   return (
-    <section id="services" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender">
+    <section className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender">
       {/* Header */}
       <div className="mb-16">
         <h2 className="text-5xl md:text-8xl text-femme-dark leading-tight italic mb-6">
@@ -244,12 +244,14 @@ export default function Services() {
           snap-centered card balanced in the viewport on mobile. Desktop
           resets to the section's own padding via md:px-0. */}
       <div
+        id="services"
         ref={ref}
         className="flex md:grid md:grid-cols-3 gap-6
           overflow-x-auto md:overflow-visible
           snap-x snap-mandatory md:snap-none
           scrollbar-hide
           -mx-6 md:mx-0 px-[7.5vw] md:px-0
+          scroll-mt-28 md:scroll-mt-32
           pb-2 md:pb-0"
       >
         {services.map((service, i) => (
