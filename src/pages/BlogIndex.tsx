@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { getInitialPosts, getPosts, formatPostDate, type Post } from "../lib/posts";
+import SafeText from "../components/SafeText";
 import {
   buildSrcSet,
   parseSanityDimensions,
@@ -46,7 +47,7 @@ function FeaturedPost({ post }: { post: Post }) {
         </div>
 
         <h2 className="text-[2.475rem] md:text-[3.3rem] text-femme-dark leading-tight italic">
-          {post.title}
+          <SafeText text={post.title} />
         </h2>
 
         <p className="text-femme-dark/65 text-[1.2375rem] leading-relaxed font-system">
@@ -103,7 +104,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
 
       {/* Title */}
       <h3 className="text-[1.65rem] text-femme-dark leading-snug group-hover:text-femme-plum transition-colors duration-200">
-        {post.title}
+        <SafeText text={post.title} />
       </h3>
 
       {/* Excerpt */}

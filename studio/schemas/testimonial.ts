@@ -9,7 +9,7 @@ export const testimonial = defineType({
       name: "name",
       title: "Couple / Client Name",
       type: "string",
-      description: 'e.g. "Priscila & Tri" — the ampersand renders in the system font.',
+      description: 'e.g. "Priscila & Tri" — special symbols render with the site fallback font.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({

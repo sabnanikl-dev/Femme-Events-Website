@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import SafeText from "./SafeText";
 
 const aboutParagraphs = [
   `As women, we're told a wedding is supposed to be the "most important day of our lives." And listen, we know life has plenty of other milestones worth screaming about: the promotion, the degree, the first home, the babies if you want them, the version of yourself you worked hard to become.`,
@@ -34,7 +35,7 @@ export default function About() {
         className="flex flex-col gap-8"
       >
         <h2 className="text-5xl md:text-8xl text-femme-dark leading-tight italic">
-          Why We Obsess Over&nbsp;"I Do"
+          <SafeText text='Why We Obsess Over "I Do"' />
         </h2>
         <div className="flex flex-col gap-5 text-femme-dark/80 text-lg md:text-xl leading-relaxed max-w-xl">
           {aboutParagraphs.map((paragraph, index) => (

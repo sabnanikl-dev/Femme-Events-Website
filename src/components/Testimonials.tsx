@@ -8,22 +8,7 @@ import {
 import { testimonials as fallbackTestimonials } from "../data/testimonials";
 import { useCarouselIndex } from "../lib/useCarouselIndex";
 import CarouselDots from "./CarouselDots";
-
-function Name({ children }: { children: string }) {
-  const parts = children.split("&");
-  return (
-    <>
-      {parts.map((part, i) => (
-        <span key={i}>
-          {part}
-          {i < parts.length - 1 && (
-            <span className="font-system">&amp;</span>
-          )}
-        </span>
-      ))}
-    </>
-  );
-}
+import SafeText from "./SafeText";
 
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(
@@ -112,7 +97,7 @@ export default function Testimonials() {
             {/* Attribution */}
             <div className="flex flex-col gap-2 items-center text-center">
               <span className="text-femme-plum text-3xl font-bold font-balgin">
-                <Name>{t.name}</Name>
+                <SafeText text={t.name} />
               </span>
               <span className="text-femme-dark/50 text-sm font-system">
                 {t.detail}

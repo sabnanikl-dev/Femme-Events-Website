@@ -9,6 +9,7 @@ import {
 import { vendorCategories as fallbackCategories } from "../data/vendors";
 import VendorOverlayCard from "./ui/VendorOverlayCard";
 import { trackEvent } from "../lib/analytics";
+import SafeText from "./SafeText";
 
 interface SelectedVendor {
   vendor: Vendor;
@@ -47,7 +48,7 @@ function VendorCard({
     >
       <div className="flex flex-col gap-0.5 min-w-0">
         <span className="text-femme-dark text-base font-balgin truncate">
-          {vendor.name}
+          <SafeText text={vendor.name} />
         </span>
         <span className="text-femme-dark/50 text-xs font-system truncate">
           {vendor.specialty}
@@ -114,7 +115,7 @@ export default function Vendors() {
             >
               <h3 className="text-2xl text-femme-plum font-balgin mb-4 flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-femme-orange shrink-0" />
-                {cat.label}
+                <SafeText text={cat.label} />
               </h3>
               <ul className="flex flex-col gap-3 min-w-0 max-w-full">
                 {cat.vendors.map((vendor, i) => (

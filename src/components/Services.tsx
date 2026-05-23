@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import CarouselDots from "./CarouselDots";
 import { useCarouselIndex } from "../lib/useCarouselIndex";
 import { trackEvent } from "../lib/analytics";
+import SafeText from "./SafeText";
 
 const services = [
   {
@@ -158,7 +159,7 @@ function ServiceCard({
             className="text-white text-5xl md:text-6xl leading-tight mb-2"
             style={{ fontFamily: "Frunchy Sage, serif", fontWeight: "bold" }}
           >
-            {service.title}
+            <SafeText text={service.title} />
           </h3>
           <p className="text-femme-pink text-sm uppercase tracking-[0.25em] font-bold font-system">
             {service.subtitle}
@@ -194,7 +195,7 @@ export default function Services() {
       {/* Header */}
       <div className="mb-16">
         <h2 className="text-5xl md:text-8xl text-femme-dark leading-tight italic mb-6">
-          For the look, the feeling, and every moving piece in between.
+          <SafeText text="For the look, the feeling, and every moving piece in between." />
         </h2>
         <div className="h-1 w-32 bg-femme-orange mb-8" />
         <div className="max-w-3xl">
