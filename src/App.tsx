@@ -38,7 +38,7 @@ function ScrollToHash() {
     const scrollToTarget = () => {
       const el = document.getElementById(id);
       if (el) {
-        el.scrollIntoView();
+        el.scrollIntoView({ block: "start" });
         return;
       }
       if (attempts++ < 20) raf = requestAnimationFrame(scrollToTarget);

@@ -135,7 +135,7 @@ export default function Navbar() {
             Journal
           </NavLink>
           <a
-            href={anchor("#inquiry")}
+            href={anchor("#inquiry-form")}
             onClick={() => trackEvent("nav_inquiry_click", { location: "nav_desktop" })}
             className={linkClass}
           >
@@ -192,7 +192,7 @@ export default function Navbar() {
                 Journal
               </NavLink>
               <a
-                href={anchor("#inquiry")}
+                href={anchor("#inquiry-form")}
                 onClick={() => {
                   closeMenu();
                   trackEvent("nav_inquiry_click", { location: "nav_mobile" });

@@ -201,7 +201,7 @@ export default function BlogPost() {
             We'd love to hear about your wedding. Fill out an inquiry and we'll be in touch within 48 hours.
           </p>
           <Link
-            to="/#inquiry"
+            to="/#inquiry-form"
             className="inline-block bg-femme-plum text-white px-8 py-3.5 rounded-full font-bold text-sm uppercase tracking-widest font-system hover:bg-femme-dark transition-colors duration-200 w-fit mt-2"
           >
             Get in Touch

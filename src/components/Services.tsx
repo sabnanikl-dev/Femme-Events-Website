@@ -100,7 +100,7 @@ function ServiceCard({
   const navigate = useNavigate();
 
   // Carries the clicked package to the inquiry form via the URL, e.g.
-  // `/?service=the-full-femme#inquiry`, so the form can prefill it.
+  // `/?service=the-full-femme#inquiry-form`, so the form can prefill it.
   const inquiryHref = inquiryHrefForLabel(service.title);
 
   return (
@@ -186,11 +186,11 @@ function ServiceCard({
             e.preventDefault();
             trackEvent("cta_inquiry_click", { location: "service_card", service: service.title });
             navigate(inquiryHref);
-            // Scroll explicitly: switching packages while already at #inquiry is
-            // a search-only URL change, so ScrollToHash (keyed on pathname/hash)
-            // won't re-fire. The section always exists on the home page, and
-            // the global scroll-padding-top keeps it clear of the navbar.
-            document.getElementById("inquiry")?.scrollIntoView();
+            // Scroll explicitly: switching packages while already at the form
+            // anchor is a search-only URL change, so ScrollToHash (keyed on
+            // pathname/hash) won't re-fire. The dedicated form anchor keeps
+            // visitors from landing in the FAQ/introduction area.
+            document.getElementById("inquiry-form")?.scrollIntoView({ block: "start" });
           }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}

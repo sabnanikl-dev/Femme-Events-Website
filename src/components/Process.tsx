@@ -124,7 +124,7 @@ export default function Process() {
         className="mt-16 md:mt-20 flex flex-col md:flex-row md:items-center gap-4 md:gap-6"
       >
         <a
-          href="#inquiry"
+          href="#inquiry-form"
           onClick={() => trackEvent("cta_inquiry_click", { location: "process" })}
           className="inline-block bg-femme-plum text-white px-10 py-4 rounded-full font-bold text-sm uppercase tracking-widest shadow-md hover:bg-femme-dark transition-colors duration-200 font-system"
         >
