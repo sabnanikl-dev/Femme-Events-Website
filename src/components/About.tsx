@@ -19,8 +19,8 @@ export default function About() {
         className="relative w-full md:w-4/5 md:ml-auto"
       >
         <img
-          src="/photos/pt2.jpg"
-          alt="Bridal detail flat lay with shoes, invitation and rings"
+          src="/photos/Obsess.jpeg"
+          alt="Smiling woman holding a Bridezillas Are In newspaper at a wedding-themed editorial shoot"
           loading="lazy"
           decoding="async"
           className="w-full h-auto object-contain shadow-2xl"
