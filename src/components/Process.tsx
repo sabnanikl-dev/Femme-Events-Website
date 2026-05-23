@@ -69,7 +69,7 @@ export default function Process() {
             overflow-x-auto overflow-y-hidden md:overflow-visible
             snap-x snap-mandatory md:snap-none
             scrollbar-hide
-            -mx-6 md:mx-0 px-6 md:px-0
+            md:mx-0 md:px-0
             pb-2 md:pb-0
             relative z-10"
         >
@@ -80,7 +80,7 @@ export default function Process() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
-              className="flex flex-col gap-5 shrink-0 w-[85vw] md:w-auto snap-start md:snap-align-none"
+              className="flex w-[78vw] shrink-0 snap-start flex-col gap-5 md:w-auto md:snap-align-none"
             >
               {/* Number badge */}
               <div className="w-20 h-20 rounded-full border-2 border-femme-plum flex items-center justify-center shrink-0 bg-femme-cream">
@@ -126,7 +126,7 @@ export default function Process() {
         <a
           href="#inquiry-form"
           onClick={() => trackEvent("cta_inquiry_click", { location: "process" })}
-          className="inline-block bg-femme-plum text-white px-10 py-4 rounded-full font-bold text-sm uppercase tracking-widest shadow-md hover:bg-femme-dark transition-colors duration-200 font-system"
+          className="inline-flex items-center justify-center bg-femme-plum text-white px-10 py-4 rounded-full font-bold text-sm uppercase tracking-widest leading-none shadow-md hover:bg-femme-dark transition-colors duration-200 font-system"
         >
           Start Your Journey
         </a>

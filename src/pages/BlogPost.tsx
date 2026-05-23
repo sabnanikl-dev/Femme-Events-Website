@@ -6,6 +6,7 @@ import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import { getInitialPost, getPost, formatPostDate, type Post } from "../lib/posts";
 import {
   buildSrcSet,
+  imageObjectPosition,
   parseSanityDimensions,
   sanityImageUrl,
 } from "../lib/imageUrl";
@@ -115,6 +116,7 @@ export default function BlogPost() {
   if (post === null) return <Navigate to="/journal" replace />;
 
   const heroDims = parseSanityDimensions(post.image);
+  const heroObjectPosition = imageObjectPosition(post.imagePosition, post.imageHotspot);
 
   return (
     <div className="min-h-screen bg-femme-cream">
@@ -130,6 +132,7 @@ export default function BlogPost() {
           fetchPriority="high"
           decoding="async"
           className="w-full h-full object-cover object-center"
+          style={heroObjectPosition ? { objectPosition: heroObjectPosition } : undefined}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-femme-dark/70 via-femme-dark/20 to-transparent" />
       </div>

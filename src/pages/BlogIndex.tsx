@@ -6,6 +6,7 @@ import { getInitialPosts, getPosts, formatPostDate, type Post } from "../lib/pos
 import SafeText from "../components/SafeText";
 import {
   buildSrcSet,
+  imageObjectPosition,
   parseSanityDimensions,
   sanityImageUrl,
 } from "../lib/imageUrl";
@@ -15,6 +16,7 @@ const CARD_WIDTHS = [400, 600, 800, 1200];
 
 function FeaturedPost({ post }: { post: Post }) {
   const dims = parseSanityDimensions(post.image);
+  const objectPosition = imageObjectPosition(post.imagePosition, post.imageHotspot);
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
@@ -34,6 +36,7 @@ function FeaturedPost({ post }: { post: Post }) {
           fetchPriority="high"
           decoding="async"
           className="w-full h-full object-cover"
+          style={objectPosition ? { objectPosition } : undefined}
         />
       </div>
 
@@ -67,6 +70,7 @@ function FeaturedPost({ post }: { post: Post }) {
 
 function PostCard({ post, index }: { post: Post; index: number }) {
   const dims = parseSanityDimensions(post.image);
+  const objectPosition = imageObjectPosition(post.imagePosition, post.imageHotspot);
   return (
     <motion.article
       layout
@@ -77,7 +81,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
       className="group flex flex-col gap-4 border-b border-femme-plum/10 pb-10"
     >
       {/* Image */}
-      <div className="overflow-hidden rounded-xl aspect-[16/5.04]">
+      <div className="overflow-hidden rounded-xl aspect-[4/3] sm:aspect-[16/9]">
         <img
           src={sanityImageUrl(post.image, { w: 800 })}
           srcSet={buildSrcSet(post.image, CARD_WIDTHS)}
@@ -88,6 +92,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          style={objectPosition ? { objectPosition } : undefined}
         />
       </div>
 

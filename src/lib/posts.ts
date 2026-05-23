@@ -7,6 +7,10 @@ import { posts as fallbackPosts, type Post as FallbackPost } from "../data/posts
 // Both are renderable by BlogPost.tsx; the renderer branches on shape.
 export interface Post extends Omit<FallbackPost, "body"> {
   body: string | PortableTextBlock[];
+  imageHotspot?: {
+    x?: number;
+    y?: number;
+  };
 }
 
 const POSTS_QUERY = `*[_type == "post"] | order(date desc){
@@ -17,6 +21,7 @@ const POSTS_QUERY = `*[_type == "post"] | order(date desc){
   date,
   readTime,
   "image": image.asset->url,
+  "imageHotspot": image.hotspot,
   body
 }`;
 
@@ -28,6 +33,7 @@ const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   date,
   readTime,
   "image": image.asset->url,
+  "imageHotspot": image.hotspot,
   body
 }`;
 

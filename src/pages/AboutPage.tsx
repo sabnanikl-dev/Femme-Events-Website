@@ -85,12 +85,12 @@ export default function AboutPage() {
               Tell us about your wedding and we'll take it from there.
             </p>
           </div>
-          <a
-            href="/#inquiry-form"
-            className="inline-block rounded-full bg-femme-plum px-8 py-4 text-center text-sm font-bold uppercase tracking-widest text-white shadow-md transition-colors duration-200 hover:bg-femme-dark font-system"
+          <Link
+            to="/#inquiry-form"
+            className="inline-flex items-center justify-center rounded-full bg-femme-plum px-8 py-4 text-center text-sm font-bold uppercase tracking-widest leading-none text-white shadow-md transition-colors duration-200 hover:bg-femme-dark font-system"
           >
             Start Your Inquiry
-          </a>
+          </Link>
         </motion.div>
       </section>
     </main>
