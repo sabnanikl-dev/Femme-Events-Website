@@ -67,15 +67,17 @@ const addons = [
 
 function IncludesList({
   service,
+  compact = false,
 }: {
   service: (typeof services)[0];
+  compact?: boolean;
 }) {
   return (
-    <ul className="flex flex-col gap-2 mb-6">
+    <ul className={`flex flex-col ${compact ? "gap-1.5 mb-5" : "gap-2 mb-6"}`}>
       {service.includes.map((item, i) => (
-        <li key={i} className="flex gap-2.5 items-start">
+        <li key={i} className={compact ? "flex gap-2 items-start" : "flex gap-2.5 items-start"}>
           <span className="w-1.5 h-1.5 rounded-full bg-femme-pink shrink-0 mt-[6px]" />
-          <span className="text-white/90 text-sm leading-snug font-system">
+          <span className={`text-white/90 leading-snug font-system ${compact ? "text-[0.8125rem]" : "text-sm"}`}>
             {item}
           </span>
         </li>
@@ -98,6 +100,7 @@ function ServiceCard({
 }) {
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
+  const isFullFemme = service.title === "The Full Femme";
 
   // Carries the clicked package to the inquiry form via the URL, e.g.
   // `/?service=the-full-femme#inquiry`, so the form can prefill it.
@@ -109,7 +112,7 @@ function ServiceCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
-      className="relative shrink-0 w-[85vw] md:w-auto h-[640px] md:h-[700px] snap-center md:snap-align-none rounded-2xl overflow-hidden cursor-pointer shadow-xl"
+      className={`relative shrink-0 w-[85vw] md:w-auto ${isFullFemme ? "h-[760px]" : "h-[640px]"} md:h-[700px] snap-center md:snap-align-none rounded-2xl overflow-hidden cursor-pointer shadow-xl`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -141,7 +144,7 @@ function ServiceCard({
       <div className="absolute inset-0 flex flex-col justify-end p-8">
         {/* Mobile: includes always visible — no hover state on touch */}
         <div className="md:hidden">
-          <IncludesList service={service} />
+          <IncludesList service={service} compact={isFullFemme} />
         </div>
 
         {/* Desktop: includes slide up on hover */}
