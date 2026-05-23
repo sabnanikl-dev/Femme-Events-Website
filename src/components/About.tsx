@@ -1,5 +1,12 @@
 import { motion } from "motion/react";
 
+const aboutParagraphs = [
+  `As women, we're told a wedding is supposed to be the "most important day of our lives." And listen, we know life has plenty of other milestones worth screaming about: the promotion, the degree, the first home, the babies if you want them, the version of yourself you worked hard to become.`,
+  `But a wedding is still pretty damn cool.`,
+  `It might be the one time all of your people are in the same room. The moment two lives, two families, and sometimes two cultures get woven together in front of everyone who loves you. It is emotional. It is chaotic. It is kind of a big deal.`,
+  `And we love the girlhood of it all: the dresses, makeup, heels, glitter, lashes, perfume, happy tears, group chats, moms, grandmothers, sisters, and girlfriends showing up with overwhelming love. It is such a feminine, personal, once-in-a-lifetime kind of energy, and Femme Events exists to protect that feeling while making sure the logistics do not eat it alive.`,
+];
+
 export default function About() {
   return (
     <section id="about" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-[2fr_3fr] gap-12 md:gap-16 items-center overflow-x-clip">
@@ -29,9 +36,11 @@ export default function About() {
         <h2 className="text-5xl md:text-8xl text-femme-dark leading-tight italic">
           Why We Obsess Over&nbsp;"I Do"
         </h2>
-        <p className="text-femme-dark/80 text-2xl leading-relaxed max-w-lg">
-          Look, anyone can book a ballroom. We zero in on the tiny moments—grandma's happy tears, the inside joke on the cocktail napkin, the playlist that makes cousins dance together on purpose.
-        </p>
+        <div className="flex flex-col gap-5 text-femme-dark/80 text-lg md:text-xl leading-relaxed max-w-xl">
+          {aboutParagraphs.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </div>
         <motion.a
           href="#services"
           whileHover={{ scale: 1.03, backgroundColor: "var(--color-femme-deep)" }}

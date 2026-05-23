@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Plus, Minus } from "lucide-react";
+import { trackEvent } from "../lib/analytics";
 
 const faqs = [
   {
@@ -99,6 +100,7 @@ export default function FAQ() {
           </p>
           <a
             href="#inquiry"
+            onClick={() => trackEvent("cta_inquiry_click", { location: "faq" })}
             className="inline-block mt-8 bg-femme-plum text-white px-8 py-3.5 rounded-full font-bold text-sm uppercase tracking-widest shadow-md hover:bg-femme-dark transition-colors duration-200 font-system"
           >
             Ask Us Directly

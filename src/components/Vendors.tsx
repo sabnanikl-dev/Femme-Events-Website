@@ -8,6 +8,7 @@ import {
 } from "../lib/vendors";
 import { vendorCategories as fallbackCategories } from "../data/vendors";
 import VendorOverlayCard from "./ui/VendorOverlayCard";
+import { trackEvent } from "../lib/analytics";
 
 interface SelectedVendor {
   vendor: Vendor;
@@ -151,6 +152,7 @@ export default function Vendors() {
         </p>
         <a
           href="#inquiry"
+          onClick={() => trackEvent("cta_inquiry_click", { location: "vendors" })}
           className="inline-block px-8 py-3.5 text-sm font-bold uppercase tracking-widest font-system
             bg-femme-plum text-white border-2 border-femme-plum
             hover:bg-femme-mauve hover:border-femme-mauve

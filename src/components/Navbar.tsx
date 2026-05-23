@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { trackEvent } from "../lib/analytics";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -133,7 +134,13 @@ export default function Navbar() {
           >
             Journal
           </NavLink>
-          <a href={anchor("#inquiry")} className={linkClass}>Inquiry</a>
+          <a
+            href={anchor("#inquiry")}
+            onClick={() => trackEvent("nav_inquiry_click", { location: "nav_desktop" })}
+            className={linkClass}
+          >
+            Inquiry
+          </a>
         </div>
 
         {/* Mobile hamburger toggle */}
@@ -184,7 +191,16 @@ export default function Navbar() {
               <NavLink to="/journal" onClick={closeMenu} className={mobileLinkClass}>
                 Journal
               </NavLink>
-              <a href={anchor("#inquiry")} onClick={closeMenu} className={mobileLinkClass}>Inquiry</a>
+              <a
+                href={anchor("#inquiry")}
+                onClick={() => {
+                  closeMenu();
+                  trackEvent("nav_inquiry_click", { location: "nav_mobile" });
+                }}
+                className={mobileLinkClass}
+              >
+                Inquiry
+              </a>
             </motion.div>
           </>
         )}

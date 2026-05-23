@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { trackEvent } from "../lib/analytics";
 
 export default function Hero() {
   return (
@@ -43,6 +44,7 @@ export default function Hero() {
         >
           <motion.a
             href="#inquiry"
+            onClick={() => trackEvent("cta_inquiry_click", { location: "hero" })}
             whileHover={{ scale: 1.05, backgroundColor: "var(--color-femme-deep)", boxShadow: "0 8px 28px rgba(131,22,84,0.5)" }}
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
@@ -76,6 +78,7 @@ export default function Hero() {
             href="https://www.instagram.com/_femmeevents/?hl=en"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent("instagram_click", { location: "hero" })}
             className="text-base md:text-xl font-medium drop-shadow-md hover:opacity-70 transition-opacity duration-200"
           >
             <span style={{ fontFamily: 'system-ui, sans-serif' }}>@_</span>femmeevents
