@@ -9,6 +9,7 @@ import {
   parseSanityDimensions,
   sanityImageUrl,
 } from "../lib/imageUrl";
+import SafeText, { SafeTextContent } from "../components/SafeText";
 
 const HERO_WIDTHS = [600, 900, 1200, 1600, 2000];
 
@@ -17,7 +18,9 @@ const HERO_WIDTHS = [600, 900, 1200, 1600, 2000];
 const portableTextComponents: PortableTextComponents = {
   block: {
     h2: ({ children }) => (
-      <h2 className="text-3xl text-femme-dark mt-10 mb-4 italic">{children}</h2>
+      <h2 className="text-3xl text-femme-dark mt-10 mb-4 italic">
+        <SafeTextContent>{children}</SafeTextContent>
+      </h2>
     ),
     normal: ({ children }) => (
       <p className="text-femme-dark/80 text-lg leading-relaxed font-system">
@@ -57,7 +60,7 @@ function renderMarkdownBody(body: string) {
     if (block.startsWith("## ")) {
       return (
         <h2 key={i} className="text-3xl text-femme-dark mt-10 mb-4 italic">
-          {block.replace("## ", "")}
+          <SafeText text={block.replace("## ", "")} />
         </h2>
       );
     }
@@ -166,7 +169,7 @@ export default function BlogPost() {
             <span className="text-xs text-femme-dark/50">{formatPostDate(post.date)}</span>
           </div>
           <h1 className="text-5xl md:text-6xl text-femme-dark leading-tight italic mb-4">
-            {post.title}
+            <SafeText text={post.title} />
           </h1>
           <p className="text-femme-dark/60 text-xl leading-relaxed font-system">
             {post.excerpt}

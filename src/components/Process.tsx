@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import CarouselDots from "./CarouselDots";
 import { useCarouselIndex } from "../lib/useCarouselIndex";
 import { trackEvent } from "../lib/analytics";
+import SafeText from "./SafeText";
 
 const steps = [
   {
@@ -93,7 +94,7 @@ export default function Process() {
                 className="text-5xl text-femme-dark"
                 style={{ fontFamily: "Frunchy Sage, serif", fontWeight: "bold" }}
               >
-                {step.label}
+                <SafeText text={step.label} />
               </h3>
 
               {/* Description */}

@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { ExternalLink, Instagram, X } from "lucide-react";
 import { instagramUrl } from "../../lib/vendors";
 import { trackEvent } from "../../lib/analytics";
+import SafeText from "../SafeText";
 
 interface VendorOverlayCardProps {
   name: string;
@@ -125,7 +126,7 @@ export default function VendorOverlayCard({
             id="vendor-overlay-name"
             className="text-femme-dark text-3xl font-balgin mb-2"
           >
-            {name}
+            <SafeText text={name} />
           </h3>
           <p className="text-femme-dark/60 text-sm font-system leading-relaxed">
             {specialty}

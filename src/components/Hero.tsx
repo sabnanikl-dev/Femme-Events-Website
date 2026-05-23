@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { trackEvent } from "../lib/analytics";
+import SafeText from "./SafeText";
 
 export default function Hero() {
   return (
@@ -34,7 +35,7 @@ export default function Hero() {
           className="text-white/90 text-lg md:text-xl uppercase tracking-[0.3em] drop-shadow-md"
           style={{ fontFamily: "Balgin, serif" }}
         >
-          Atlanta Wedding Partial Planning &amp; Design
+          <SafeText text="Atlanta Wedding Partial Planning & Design" />
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -68,8 +69,8 @@ export default function Hero() {
         </div>
         <div className="flex flex-col gap-1.5 md:gap-2 text-right md:text-center">
           <span className="text-[10px] md:text-xs uppercase tracking-widest opacity-75">Email</span>
-          <span className="text-sm md:text-xl font-medium drop-shadow-md break-all md:break-normal">
-            Amanda<span style={{ fontFamily: 'system-ui, sans-serif' }}>@</span>FemmeEvents.com
+          <span className="text-sm md:text-xl font-medium drop-shadow-md break-all md:break-normal font-system">
+            Amanda@FemmeEvents.com
           </span>
         </div>
         <div className="flex flex-col gap-1.5 md:gap-2 md:text-center">
@@ -79,14 +80,14 @@ export default function Hero() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackEvent("instagram_click", { location: "hero" })}
-            className="text-base md:text-xl font-medium drop-shadow-md hover:opacity-70 transition-opacity duration-200"
+            className="text-base md:text-xl font-medium drop-shadow-md hover:opacity-70 transition-opacity duration-200 font-system"
           >
-            <span style={{ fontFamily: 'system-ui, sans-serif' }}>@_</span>femmeevents
+            @_femmeevents
           </a>
         </div>
         <div className="flex flex-col gap-1.5 md:gap-2 text-right">
           <span className="text-[10px] md:text-xs uppercase tracking-widest opacity-75">Phone</span>
-          <span className="text-base md:text-xl font-medium drop-shadow-md" style={{ fontFamily: 'system-ui, sans-serif' }}>(678) 644-5257</span>
+          <span className="text-base md:text-xl font-medium drop-shadow-md font-system">(678) 644-5257</span>
         </div>
       </motion.div>
     </section>
