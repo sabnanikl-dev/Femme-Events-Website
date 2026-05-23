@@ -88,7 +88,7 @@ export default function Inquiry() {
       <section id="inquiry" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16 items-center">
         <div className="flex flex-col gap-6">
           <h2 className="text-6xl md:text-8xl text-femme-dark leading-[0.95] italic">
-            <SafeText text="Ready to Chat Dates & Dreams?" />
+            <SafeText text="Ready to Chat Dates and Dreams?" />
           </h2>
           <p className="text-femme-dark/70 text-xl font-system">
             Drop us a line and let&apos;s see if your calendar and our magic align.
@@ -154,7 +154,7 @@ export default function Inquiry() {
       <div className="mx-auto mt-16 grid max-w-6xl gap-12 md:grid-cols-[minmax(0,0.82fr)_minmax(420px,1fr)] md:items-start">
         <div id="inquiry-form" className="scroll-mt-28 flex flex-col gap-6 md:sticky md:top-32">
           <h2 className="text-6xl italic leading-[0.95] text-femme-dark md:text-8xl">
-            <SafeText text="Ready to Chat Dates & Dreams?" />
+            <SafeText text="Ready to Chat Dates and Dreams?" />
           </h2>
           <p className="text-xl text-femme-dark/70 font-system">
             Drop us a line and let&apos;s see if your calendar and our magic align.
