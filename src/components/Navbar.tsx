@@ -117,7 +117,14 @@ export default function Navbar() {
             scrolled ? "text-femme-dark" : "text-white"
           }`}
         >
-          <a href={anchor("#about")} className={linkClass}>About</a>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `${linkClass}${isActive ? " opacity-60" : ""}`
+            }
+          >
+            About
+          </NavLink>
           <a href={anchor("#services")} className={linkClass}>Services</a>
           <NavLink
             to="/journal"
@@ -179,7 +186,7 @@ export default function Navbar() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="md:hidden fixed top-20 left-4 right-4 z-50 bg-femme-cream/98 backdrop-blur-md rounded-2xl shadow-lg p-3 flex flex-col gap-1"
             >
-              <a href={anchor("#about")} onClick={closeMenu} className={mobileLinkClass}>About</a>
+              <NavLink to="/about" onClick={closeMenu} className={mobileLinkClass}>About</NavLink>
               <a href={anchor("#services")} onClick={closeMenu} className={mobileLinkClass}>Services</a>
               <NavLink to="/journal" onClick={closeMenu} className={mobileLinkClass}>
                 Journal
