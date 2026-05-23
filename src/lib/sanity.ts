@@ -15,12 +15,13 @@ export const sanityClient: SanityClient | null = projectId
       useCdn: true,
       // Fail fast on read errors so the UI degrades quickly. Every data
       // helper (posts/vendors/testimonials) already falls back to static
-      // content on a rejected fetch, but the client has no request timeout
-      // by default and retries failed reads (maxRetries defaults to 5) with
-      // exponential back-off — so a blocked or stalled read can leave the
-      // Journal sitting on "Loading…" instead of reaching that fallback
-      // (see issue #124). timeout caps any single request; maxRetries: 0
-      // skips retrying a doomed public-CDN read.
+      // content on a rejected fetch, but the client defaults to a long
+      // 5-minute request ceiling and retries failed reads (maxRetries
+      // defaults to 5) with exponential back-off — so a blocked or stalled
+      // read can leave the Journal sitting on "Loading…" instead of reaching
+      // that fallback (see issue #124). timeout lowers the per-request
+      // ceiling to 10 seconds; maxRetries: 0 skips retrying a doomed
+      // public-CDN read.
       maxRetries: 0,
       timeout: 10000,
     })
