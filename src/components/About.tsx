@@ -37,7 +37,7 @@ export default function About() {
         <h2 className="text-5xl md:text-8xl text-femme-dark leading-tight italic">
           <SafeText text='Why We Obsess Over "I Do"' />
         </h2>
-        <div className="flex flex-col gap-5 text-femme-dark/80 text-lg md:text-xl leading-relaxed max-w-xl">
+        <div className="flex flex-col gap-5 text-femme-dark/80 text-lg md:text-xl leading-relaxed max-w-xl font-system">
           {aboutParagraphs.map((paragraph, index) => (
             <p key={index}>{paragraph}</p>
           ))}
