@@ -20,10 +20,10 @@ export const SERVICE_OPTIONS: ServiceOption[] = [
 // Neutral fallback for visitors who reach the form without picking a package.
 export const NOT_SURE_LABEL = "Not sure yet";
 
-/** Maps a card label to its CTA link, e.g. `/?service=the-full-femme#inquiry`. */
+/** Maps a card label to its CTA link, e.g. `/?service=the-full-femme#inquiry-form`. */
 export function inquiryHrefForLabel(label: string): string {
   const slug = SERVICE_OPTIONS.find((o) => o.label === label)?.slug;
-  return slug ? `/?service=${slug}#inquiry` : "#inquiry";
+  return slug ? `/?service=${slug}#inquiry-form` : "#inquiry-form";
 }
 
 /** Resolves a URL `?service=<slug>` value back to its display label, or "". */

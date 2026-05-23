@@ -141,7 +141,7 @@ export default function WhatHappensNextPage() {
             </p>
           </div>
           <Link
-            to="/#inquiry"
+            to="/#inquiry-form"
             className="inline-block rounded-full bg-femme-plum px-8 py-4 text-center text-sm font-bold uppercase tracking-widest text-white shadow-md transition-colors duration-200 hover:bg-femme-dark font-system"
           >
             Start Your Journey

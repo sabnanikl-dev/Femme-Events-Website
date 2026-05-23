@@ -152,7 +152,7 @@ export default function Vendors() {
           Want recommendations for something not listed here?
         </p>
         <a
-          href="#inquiry"
+          href="#inquiry-form"
           onClick={() => trackEvent("cta_inquiry_click", { location: "vendors" })}
           className="inline-block px-8 py-3.5 text-sm font-bold uppercase tracking-widest font-system
             bg-femme-plum text-white border-2 border-femme-plum

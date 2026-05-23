@@ -99,7 +99,7 @@ export default function FAQ() {
             Still not sure? Fill out an inquiry — no pressure, just conversation.
           </p>
           <a
-            href="#inquiry"
+            href="#inquiry-form"
             onClick={() => trackEvent("cta_inquiry_click", { location: "faq" })}
             className="inline-block mt-8 bg-femme-plum text-white px-8 py-3.5 rounded-full font-bold text-sm uppercase tracking-widest shadow-md hover:bg-femme-dark transition-colors duration-200 font-system"
           >

@@ -44,7 +44,7 @@ export default function Hero() {
           className="mt-14"
         >
           <motion.a
-            href="#inquiry"
+            href="#inquiry-form"
             onClick={() => trackEvent("cta_inquiry_click", { location: "hero" })}
             whileHover={{ scale: 1.05, backgroundColor: "var(--color-femme-deep)", boxShadow: "0 8px 28px rgba(131,22,84,0.5)" }}
             whileTap={{ scale: 0.97 }}
