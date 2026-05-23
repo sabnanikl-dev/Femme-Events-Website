@@ -29,6 +29,12 @@ export default function Testimonials() {
     testimonials.length,
   );
 
+  // No real testimonials yet (empty CMS + empty fallback): hide the whole
+  // section instead of rendering an empty "Kind Words" header. It reappears
+  // automatically once entries are added in Sanity. Placed after all hooks so
+  // the Rules of Hooks are respected.
+  if (testimonials.length === 0) return null;
+
   return (
     <section className="py-16 md:py-24 px-6 md:px-24 bg-femme-pale">
       {/* Header row with arrow */}
