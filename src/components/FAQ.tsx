@@ -22,7 +22,7 @@ const faqs = [
   {
     question: "What's the difference between your packages?",
     answer:
-      "Just Show Up (Day-of) is for couples who've planned everything and just need someone to execute flawlessly on the day. Getting It Together (Partial) adds planning sessions, vendor support, and design direction. The Full Femme is end-to-end — design, planning, logistics, and everything in between. You can also mix in à la carte add-ons to any package.",
+      "In Your Corner (Wedding Coordination) is for couples who've planned everything and just need someone to run the day flawlessly. Getting It Together (Partial Planning + Coordination) adds planning sessions, vendor support, and decor coordination. The Full Femme (Full Coordination + Design Guidance) is the end-to-end option: full design direction, planning, logistics, and everything in between. You can also mix in à la carte add-ons to any package.",
   },
   {
     question: "Can I customize my package?",
