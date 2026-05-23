@@ -116,46 +116,57 @@ export default function Inquiry() {
 
   /* ──────────── Normal form ──────────── */
   return (
-    <section id="inquiry" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16">
+    <section id="inquiry" className="bg-femme-lavender px-6 py-16 md:px-16 md:py-24 lg:px-24">
       {/* Audience / differentiator — confidence block before the form (Issue #87) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="md:col-span-2 max-w-3xl mx-auto text-center"
+        className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.8fr)] lg:items-center"
       >
-        <p className="text-femme-dark text-3xl md:text-4xl italic font-display leading-tight mb-8">
-          <SafeText text="You belong here if you want the wedding to feel like you, not like a checklist someone handed you." />
-        </p>
-        <p className="text-femme-dark/70 text-base md:text-lg font-system leading-relaxed mb-8">
-          Bring us the disco balls, the bows, the moody florals, the dramatic
-          dress change, the sentimental ceremony, the different little detail
-          nobody else understands, the hyper-feminine fantasy, the alternative
-          mood board, the silly inside joke, the “is this too much?” idea.
-        </p>
-        <p className="text-femme-plum text-2xl md:text-3xl italic font-display">
-          <SafeText text="It is not too much. It is the point." />
-        </p>
+        <div className="flex flex-col gap-7">
+          <p className="text-3xl italic leading-tight text-femme-dark font-display md:text-5xl">
+            <SafeText text="You belong here if you want the wedding to feel like you, not like a checklist someone handed you." />
+          </p>
+          <p className="text-base leading-relaxed text-femme-dark/70 font-system md:text-lg">
+            Bring us the disco balls, the bows, the moody florals, the dramatic
+            dress change, the sentimental ceremony, the different little detail
+            nobody else understands, the hyper-feminine fantasy, the alternative
+            mood board, the silly inside joke, the “is this too much?” idea.
+          </p>
+          <p className="text-2xl italic text-femme-plum font-display md:text-3xl">
+            <SafeText text="It is not too much. It is the point." />
+          </p>
+        </div>
+
+        <figure className="aspect-[16/11] overflow-hidden rounded-lg bg-femme-pale shadow-[0_22px_55px_rgba(36,15,21,0.16)]">
+          <img
+            src="/photos/inquirybrand.JPG"
+            alt="Femme Events brand details with a disco ball, flowers, and heart cake"
+            className="h-full w-full object-cover object-[50%_48%]"
+          />
+        </figure>
       </motion.div>
 
-      <div className="flex flex-col gap-6">
-        <h2 className="text-6xl md:text-8xl text-femme-dark leading-[0.95] italic">
-          <SafeText text="Ready to Chat Dates & Dreams?" />
-        </h2>
-        <p className="text-femme-dark/70 text-xl font-system">
-          Drop us a line and let&apos;s see if your calendar and our magic align.
-        </p>
-      </div>
+      <div className="mx-auto mt-16 grid max-w-6xl gap-12 md:grid-cols-[minmax(0,0.82fr)_minmax(420px,1fr)] md:items-start">
+        <div className="flex flex-col gap-6 md:sticky md:top-32">
+          <h2 className="text-6xl italic leading-[0.95] text-femme-dark md:text-8xl">
+            <SafeText text="Ready to Chat Dates & Dreams?" />
+          </h2>
+          <p className="text-xl text-femme-dark/70 font-system">
+            Drop us a line and let&apos;s see if your calendar and our magic align.
+          </p>
+        </div>
 
-      <motion.form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-5"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
+        <motion.form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-5"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
         {state === "error" && (
           <div className="flex items-start gap-3 p-4 rounded-lg border bg-red-50 border-red-200 text-red-700">
             <AlertCircle size={20} className="shrink-0 mt-0.5" />
@@ -310,7 +321,8 @@ export default function Inquiry() {
           {submitting && <Loader2 size={18} className="animate-spin" />}
           {submitting ? "Sending..." : "Send Inquiry"}
         </motion.button>
-      </motion.form>
+        </motion.form>
+      </div>
     </section>
   );
 }
