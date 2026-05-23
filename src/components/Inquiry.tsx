@@ -25,11 +25,13 @@ export default function Inquiry() {
     () => labelForSlug(new URLSearchParams(location.search).get("service")) || NOT_SURE_LABEL,
   );
 
-  // Keep the dropdown in sync when the URL param changes — e.g. a visitor
-  // already at the form clicks a different package's "Book Now".
+  // Keep the dropdown mirroring the URL's ?service= param across every SPA
+  // navigation: clicking a different package's "Book Now", and also Back/Forward
+  // or an invalid/removed slug — both reset to the neutral fallback so the form
+  // never shows a stale package the URL no longer reflects.
   useEffect(() => {
     const label = labelForSlug(new URLSearchParams(location.search).get("service"));
-    if (label) setSelectedService(label);
+    setSelectedService(label || NOT_SURE_LABEL);
   }, [location.search]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
