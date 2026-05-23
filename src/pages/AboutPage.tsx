@@ -11,7 +11,7 @@ const closingLine = `You guide the feeling. We handle everything else.`;
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-femme-cream pt-32">
+    <main className="min-h-screen bg-femme-lavender pt-32">
       <section className="px-6 pb-16 md:px-24 md:pb-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -64,12 +64,12 @@ export default function AboutPage() {
               Tell us about your wedding and we'll take it from there.
             </p>
           </div>
-          <Link
-            to="/#inquiry"
+          <a
+            href="/#inquiry"
             className="inline-block rounded-full bg-femme-plum px-8 py-4 text-center text-sm font-bold uppercase tracking-widest text-white shadow-md transition-colors duration-200 hover:bg-femme-dark font-system"
           >
             Start Your Inquiry
-          </Link>
+          </a>
         </motion.div>
       </section>
     </main>
