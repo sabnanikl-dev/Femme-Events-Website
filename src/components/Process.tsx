@@ -6,27 +6,27 @@ import { trackEvent } from "../lib/analytics";
 const steps = [
   {
     number: "01",
-    label: "Book",
+    label: "Inquire",
     description:
       "Fill out the inquiry form and we'll get back to you within 48 hours to schedule a free consultation call.",
   },
   {
     number: "02",
-    label: "Plan",
+    label: "Get Organized",
     description:
-      "We map out your vision — vendors, timelines, budgets, and everything in between. You make decisions; we handle the logistics.",
+      "We gather the vendor contracts, contact information, priorities, timelines, and moving pieces so nothing important is floating around in a group chat.",
   },
   {
     number: "03",
-    label: "Design",
+    label: "Shape the Look",
     description:
-      "Mood boards, color palettes, decor direction — we build the aesthetic so your day looks exactly how you dreamed it.",
+      "Mood boards, color palettes, floral notes, linens, stationery guidance, and decor direction help the aesthetic feel cohesive without forcing it into a template.",
   },
   {
     number: "04",
     label: "Celebrate",
     description:
-      "Show up, breathe, and soak it all in. We're running the show behind the scenes so you never have to.",
+      "You guide the energy. We run the timeline, vendors, setup, rehearsal, and wedding-day logistics so you can be fully present with your people.",
   },
 ];
 
@@ -50,7 +50,7 @@ export default function Process() {
         </h2>
         <div className="h-1 w-32 bg-femme-orange" />
         <p className="mt-6 text-femme-dark/60 text-xl font-system max-w-xl">
-          From the moment you reach out to the last dance — here's how we make it happen.
+          From the moment you reach out to the last dance, here's how we make it happen.
         </p>
       </motion.div>
 
