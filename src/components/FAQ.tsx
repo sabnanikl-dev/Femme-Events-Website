@@ -16,8 +16,7 @@ const faqs = [
   },
   {
     question: "Do you do destination weddings?",
-    answer:
-      "Yes! If you're dreaming of a wedding outside the Atlanta area, we're in. A destination premium applies for events 30+ miles from Atlanta to cover travel and logistics. Let's chat — no venue is too far for the right couple.",
+    answer: "try me",
   },
   {
     question: "What's the difference between your packages?",
