@@ -16,7 +16,7 @@ with journal/blog, testimonials, and vendor content served from Sanity CMS
 
 ## Run locally
 
-**Prerequisites:** Node.js 18+
+**Prerequisites:** Node.js 20.19+ or 22.12+ (required by `@vitejs/plugin-react` and `@portabletext/react`)
 
 ```bash
 npm install
