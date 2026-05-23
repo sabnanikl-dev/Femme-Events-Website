@@ -6,49 +6,50 @@ import { trackEvent } from "../lib/analytics";
 
 const services = [
   {
-    title: "Just Show Up",
-    subtitle: "Day-of Coordination",
+    title: "In Your Corner",
+    subtitle: "Wedding Coordination",
     image: "/photos/pt3.jpg",
     alt: "Couple sharing a moment by arched window",
     includes: [
+      "Services begin six weeks before the wedding day",
       "Initial consultation + venue walkthrough",
-      "Vendor coordination (contracts, timelines, contact info)",
-      "Detailed day-of timeline",
-      "8-hour day-of coordination with 2 coordinators",
+      "Vendor coordination: contracts, timelines, and contact information",
+      "Detailed wedding timeline",
+      "All-day wedding management",
       "Rehearsal coordination",
-      "Post-wedding vendor tip management",
       "Items pickup and venue breakdown oversight",
     ],
-    note: "Add-on: Extended coverage (+4 hours) available",
+    note: null,
   },
   {
     title: "Getting It Together",
-    subtitle: "Partial Planning",
+    subtitle: "Partial Planning + Coordination",
     image: "/photos/kj1.jpg",
     alt: "Couple sharing a kiss in the car after their ceremony",
     includes: [
-      "Everything in Day-of Coordination, plus:",
-      "3–4 planning sessions (virtual or in-person)",
-      "Vendor recommendations + meeting attendance (up to 3)",
-      "Design concept development + mood boards",
-      "Budget tracking and management",
-      "Decor coordination (what to buy, where, and how to set it up)",
+      "Services begin 12 weeks before the wedding day",
+      "Everything in Wedding Coordination, plus:",
+      "3-4 planning sessions, virtual or in-person",
+      "Vendor recommendations",
+      "Vendor meeting attendance, up to 3 meetings",
+      "Decor coordination: what to source, where it goes, and how it gets set up",
     ],
     note: null,
   },
   {
     title: "The Full Femme",
-    subtitle: "Full Coordination + Design",
+    subtitle: "Full Coordination + Design Guidance",
     image: "/photos/kj2.jpg",
     alt: "Couple celebrating their grand exit through a confetti send-off",
     includes: [
-      "Everything in Partial Planning, plus:",
-      "Full design direction (color palette, mood, aesthetic guidance)",
+      "Services begin six months before the wedding day",
+      "Everything in Partial Planning + Coordination, plus:",
+      "Full design direction for the wedding's overall mood, palette, and visual story",
+      "Pinterest and mood board refinement so the inspiration turns into a cohesive design plan",
+      "Floral direction, linen selection, stationery guidance, decor notes, and styling details",
       "DIY decor sourcing + creation coordination",
-      "Unlimited planning support (text / email / Voxer)",
-      "Welcome bag + stationery design guidance",
-      "Day-after brunch coordination (if applicable)",
-      "Post-wedding social media content strategy",
+      "Unlimited planning support by call and email",
+      "High-touch coordination so the wedding feels intentional, personal, and visually pulled together",
     ],
     note: null,
   },
@@ -59,7 +60,6 @@ const addons = [
   "Welcome party coordination",
   "Decor package (setup + breakdown only)",
   "Destination wedding premium (30+ miles)",
-  "Second coordinator",
 ];
 
 function IncludesList({
@@ -193,10 +193,23 @@ export default function Services() {
     <section id="services" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender">
       {/* Header */}
       <div className="mb-16">
-        <h2 className="text-6xl md:text-8xl lg:text-9xl text-femme-dark mb-4 italic font-bold">
-          Services That Save Sanity
+        <h2 className="text-5xl md:text-8xl text-femme-dark leading-tight italic mb-6">
+          For the look, the feeling, and every moving piece in between.
         </h2>
-        <div className="h-1 w-32 bg-femme-orange" />
+        <div className="h-1 w-32 bg-femme-orange mb-8" />
+        <div className="max-w-3xl">
+          <p className="text-femme-dark/70 text-base md:text-lg font-system leading-relaxed mb-4">
+            Femme Events is for couples who know what they want the wedding to
+            feel like, even if they need help turning the Pinterest boards,
+            vendor emails, family opinions, and tiny moving pieces into an actual
+            plan.
+          </p>
+          <p className="text-femme-dark/70 text-base md:text-lg font-system leading-relaxed">
+            We do not believe in “this is how it’s always done.” We believe in
+            your way, your energy, your people, and a planning process that feels
+            safe, clear, and completely supported.
+          </p>
+        </div>
       </div>
 
       {/* Service Cards: horizontal scroll on mobile, grid on desktop.
