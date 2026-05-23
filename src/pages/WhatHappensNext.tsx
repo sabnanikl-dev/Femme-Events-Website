@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
+import SafeText from "../components/SafeText";
 
 const timeline = [
   {
@@ -90,7 +91,7 @@ export default function WhatHappensNextPage() {
             After you book
           </p>
           <h1 className="mb-6 text-6xl italic text-femme-dark md:text-8xl lg:text-9xl">
-            The Planning Flow
+            <SafeText text="The Planning Flow" />
           </h1>
           <div className="h-1 w-32 bg-femme-orange" />
           <p className="mt-6 max-w-2xl text-xl leading-relaxed text-femme-dark/65 font-system">
@@ -115,7 +116,7 @@ export default function WhatHappensNextPage() {
                 <span className="h-px flex-1 bg-femme-plum/15" aria-hidden="true" />
               </div>
               <h2 className="mb-3 text-3xl text-femme-dark font-balgin">
-                {step.title}
+                <SafeText text={step.title} />
               </h2>
               <p className="text-base leading-relaxed text-femme-dark/65 font-system">
                 {step.description}
@@ -133,7 +134,7 @@ export default function WhatHappensNextPage() {
         >
           <div>
             <h2 className="text-3xl text-femme-dark font-balgin">
-              Want us in your corner?
+              <SafeText text="Want us in your corner?" />
             </h2>
             <p className="mt-2 text-femme-dark/60 font-system">
               Start with the inquiry form and we’ll take it from there.

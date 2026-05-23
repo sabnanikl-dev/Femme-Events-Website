@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Plus, Minus } from "lucide-react";
 import { trackEvent } from "../lib/analytics";
+import SafeText from "./SafeText";
 
 const faqs = [
   {
@@ -91,7 +92,7 @@ export default function FAQ() {
           className="md:sticky md:top-32"
         >
           <h2 className="text-5xl md:text-8xl text-femme-dark italic leading-tight mb-4">
-            Questions We Actually Get Asked
+            <SafeText text="Questions We Actually Get Asked" />
           </h2>
           <div className="h-1 w-32 bg-femme-orange mb-6" />
           <p className="text-femme-dark/60 text-lg font-system leading-relaxed">

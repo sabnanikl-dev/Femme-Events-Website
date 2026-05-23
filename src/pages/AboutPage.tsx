@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
+import SafeText from "../components/SafeText";
 
 const storyParagraphs = [
   `Femme Events started with a simple frustration: weddings can feel way too obsessed with rules.`,
@@ -29,7 +30,7 @@ export default function AboutPage() {
             Our Story
           </p>
           <h1 className="mb-6 text-5xl italic text-femme-dark md:text-7xl">
-            For celebrations with feeling, personality, and a plan.
+            <SafeText text="For celebrations with feeling, personality, and a plan." />
           </h1>
           <div className="h-1 w-32 bg-femme-orange" />
         </motion.div>
@@ -45,7 +46,7 @@ export default function AboutPage() {
             <p key={index}>{paragraph}</p>
           ))}
           <p className="mt-2 text-3xl italic leading-snug text-femme-plum md:text-4xl">
-            {closingLine}
+            <SafeText text={closingLine} />
           </p>
         </motion.div>
 
@@ -58,7 +59,7 @@ export default function AboutPage() {
         >
           <div>
             <h2 className="text-3xl text-femme-dark font-balgin">
-              Ready when you are
+              <SafeText text="Ready when you are" />
             </h2>
             <p className="mt-2 text-femme-dark/60 font-system">
               Tell us about your wedding and we'll take it from there.

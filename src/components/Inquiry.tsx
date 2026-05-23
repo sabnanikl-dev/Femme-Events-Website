@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { trackEvent } from "../lib/analytics";
+import SafeText from "./SafeText";
 
 const labelClass = "text-xs uppercase tracking-widest font-bold opacity-60 font-system";
 const inputClass =
@@ -66,10 +67,10 @@ export default function Inquiry() {
   /* ──────────── Success state ──────────── */
   if (state === "success") {
     return (
-      <section id="inquiry" className="scroll-mt-24 md:scroll-mt-28 py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16 items-center">
+      <section id="inquiry" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16 items-center">
         <div className="flex flex-col gap-6">
           <h2 className="text-6xl md:text-8xl text-femme-dark leading-[0.95] italic">
-            Ready to Chat Dates &amp; Dreams?
+            <SafeText text="Ready to Chat Dates & Dreams?" />
           </h2>
           <p className="text-femme-dark/70 text-xl font-system">
             Drop us a line and let&apos;s see if your calendar and our magic align.
@@ -83,7 +84,9 @@ export default function Inquiry() {
           className="flex flex-col items-center justify-center text-center gap-6 py-16 px-8 bg-femme-cream/80 rounded-2xl border border-femme-pink/30"
         >
           <CheckCircle2 size={56} className="text-femme-plum" strokeWidth={1.5} />
-          <h3 className="text-4xl text-femme-dark font-display">You&apos;re In!</h3>
+          <h3 className="text-4xl text-femme-dark font-display">
+            <SafeText text="You're In!" />
+          </h3>
           <p className="text-femme-dark/60 text-lg font-system max-w-md">
             We&apos;ll review your inquiry and get back to you within 24 hours. 
             Check your inbox (and spam) for our reply.
@@ -95,7 +98,7 @@ export default function Inquiry() {
 
   /* ──────────── Normal form ──────────── */
   return (
-    <section id="inquiry" className="scroll-mt-24 md:scroll-mt-28 py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16">
+    <section id="inquiry" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16">
       {/* Audience / differentiator — confidence block before the form (Issue #87) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -105,8 +108,7 @@ export default function Inquiry() {
         className="md:col-span-2 max-w-3xl mx-auto text-center"
       >
         <p className="text-femme-dark text-3xl md:text-4xl italic font-display leading-tight mb-8">
-          You belong here if you want the wedding to feel like you, not like a
-          checklist someone handed you.
+          <SafeText text="You belong here if you want the wedding to feel like you, not like a checklist someone handed you." />
         </p>
         <p className="text-femme-dark/70 text-base md:text-lg font-system leading-relaxed mb-8">
           Bring us the disco balls, the bows, the moody florals, the dramatic
@@ -115,13 +117,13 @@ export default function Inquiry() {
           mood board, the silly inside joke, the “is this too much?” idea.
         </p>
         <p className="text-femme-plum text-2xl md:text-3xl italic font-display">
-          It is not too much. It is the point.
+          <SafeText text="It is not too much. It is the point." />
         </p>
       </motion.div>
 
       <div className="flex flex-col gap-6">
         <h2 className="text-6xl md:text-8xl text-femme-dark leading-[0.95] italic">
-          Ready to Chat Dates &amp; Dreams?
+          <SafeText text="Ready to Chat Dates & Dreams?" />
         </h2>
         <p className="text-femme-dark/70 text-xl font-system">
           Drop us a line and let&apos;s see if your calendar and our magic align.

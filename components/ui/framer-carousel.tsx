@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, animate } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import SafeText from '@/src/components/SafeText';
 
 export interface CarouselItem {
   id: number;
@@ -69,7 +70,9 @@ export function FramerCarousel({ items }: FramerCarouselProps) {
 
               {/* Caption */}
               <div className="absolute bottom-0 left-0 right-0 p-8">
-                <p className="text-white text-3xl font-bold font-balgin">{item.couple}</p>
+                <p className="text-white text-3xl font-bold font-balgin">
+                  <SafeText text={item.couple} />
+                </p>
                 <p className="text-white/70 text-sm font-system mt-1">{item.location} · {item.detail}</p>
               </div>
             </div>
