@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { trackEvent } from "../lib/analytics";
 
 const labelClass = "text-xs uppercase tracking-widest font-bold opacity-60 font-system";
 const inputClass =
@@ -47,6 +48,8 @@ export default function Inquiry() {
       if (res.ok) {
         setState("success");
         form.reset();
+        // Conversion signal only — no form-field contents are ever sent.
+        trackEvent("inquiry_submit", { location: "inquiry_form" });
       } else {
         throw new Error(`Server responded with ${res.status}`);
       }
