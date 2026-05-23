@@ -145,6 +145,8 @@ export default function Inquiry() {
             src="/photos/inquirybrand.JPG"
             alt="Femme Events brand details with a disco ball, flowers, and heart cake"
             className="h-full w-full object-cover object-[50%_48%]"
+            loading="lazy"
+            decoding="async"
           />
         </figure>
       </motion.div>
