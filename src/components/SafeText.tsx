@@ -1,7 +1,7 @@
 import { Fragment, cloneElement, isValidElement, type ReactNode } from "react";
 
-const SYMBOL_SPLIT_PATTERN = /([&+@_/()•©·"'‘’“”–—-])/g;
-const SYMBOL_ONLY_PATTERN = /^[&+@_/()•©·"'‘’“”–—-]$/;
+const SYMBOL_SPLIT_PATTERN = /([&+@_])/g;
+const SYMBOL_ONLY_PATTERN = /^[&+@_]$/;
 
 interface SafeTextProps {
   text: string;
