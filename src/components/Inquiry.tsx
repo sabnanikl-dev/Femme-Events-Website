@@ -66,7 +66,7 @@ export default function Inquiry() {
   /* ──────────── Success state ──────────── */
   if (state === "success") {
     return (
-      <section id="inquiry" className="scroll-mt-24 md:scroll-mt-28 py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16 items-center">
+      <section id="inquiry" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16 items-center">
         <div className="flex flex-col gap-6">
           <h2 className="text-6xl md:text-8xl text-femme-dark leading-[0.95] italic">
             Ready to Chat Dates &amp; Dreams?
@@ -95,7 +95,7 @@ export default function Inquiry() {
 
   /* ──────────── Normal form ──────────── */
   return (
-    <section id="inquiry" className="scroll-mt-24 md:scroll-mt-28 py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16">
+    <section id="inquiry" className="py-16 md:py-24 px-6 md:px-24 bg-femme-lavender grid md:grid-cols-2 gap-16">
       {/* Audience / differentiator — confidence block before the form (Issue #87) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
