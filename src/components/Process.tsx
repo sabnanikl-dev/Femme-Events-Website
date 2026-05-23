@@ -66,7 +66,7 @@ export default function Process() {
         <div
           ref={ref}
           className="flex md:grid md:grid-cols-4 gap-6
-            overflow-x-auto md:overflow-visible
+            overflow-x-auto overflow-y-hidden md:overflow-visible
             snap-x snap-mandatory md:snap-none
             scrollbar-hide
             -mx-6 md:mx-0 px-6 md:px-0
