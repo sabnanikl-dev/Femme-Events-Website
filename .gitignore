@@ -6,3 +6,7 @@ dist/
 
 # Playwright MCP review artifacts (console logs + page snapshots)
 .playwright-mcp/
+
+# Python bytecode (from agent tooling scripts)
+__pycache__/
+*.pyc
