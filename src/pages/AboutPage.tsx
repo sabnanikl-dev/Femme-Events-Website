@@ -13,26 +13,36 @@ const closingLine = `You guide the feeling. We handle everything else.`;
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-femme-lavender pt-32">
-      <section className="px-6 pb-16 md:px-24 md:pb-24">
+      <section className="px-6 pb-16 md:px-16 md:pb-24 lg:px-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mx-auto max-w-3xl"
+          className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.7fr)] lg:items-center"
         >
-          <Link
-            to="/"
-            className="mb-8 inline-block text-sm font-bold uppercase tracking-widest text-femme-plum transition-colors duration-200 hover:text-femme-dark font-system"
-          >
-            ← Back to home
-          </Link>
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-femme-plum/70 font-system">
-            Our Story
-          </p>
-          <h1 className="mb-6 text-5xl italic text-femme-dark md:text-7xl">
-            <SafeText text="For celebrations with feeling, personality, and a plan." />
-          </h1>
-          <div className="h-1 w-32 bg-femme-orange" />
+          <div>
+            <Link
+              to="/"
+              className="mb-8 inline-block text-sm font-bold uppercase tracking-widest text-femme-plum transition-colors duration-200 hover:text-femme-dark font-system"
+            >
+              ← Back to home
+            </Link>
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-femme-plum/70 font-system">
+              Our Story
+            </p>
+            <h1 className="mb-6 max-w-4xl text-5xl italic leading-[0.94] text-femme-dark md:text-7xl">
+              <SafeText text="For celebrations with feeling, personality, and a plan." />
+            </h1>
+            <div className="h-1 w-32 bg-femme-orange" />
+          </div>
+
+          <figure className="relative mt-2 aspect-[4/5] overflow-hidden rounded-lg bg-femme-pale shadow-[0_22px_55px_rgba(36,15,21,0.18)] lg:mt-0">
+            <img
+              src="/photos/Aboutpinksit.jpg"
+              alt="Amanda seated in a pink outfit"
+              className="h-full w-full object-cover object-[50%_40%]"
+            />
+          </figure>
         </motion.div>
 
         <motion.div
@@ -40,14 +50,24 @@ export default function AboutPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-          className="mx-auto mt-10 flex max-w-3xl flex-col gap-6 text-lg leading-relaxed text-femme-dark/75 md:text-xl font-system"
+          className="mx-auto mt-16 grid max-w-6xl gap-12 lg:grid-cols-[minmax(280px,0.75fr)_minmax(0,1fr)] lg:items-start"
         >
-          {storyParagraphs.map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
-          <p className="mt-2 text-3xl italic leading-snug text-femme-plum md:text-4xl">
-            <SafeText text={closingLine} />
-          </p>
+          <figure className="order-2 aspect-[3/4] overflow-hidden rounded-lg bg-femme-pale shadow-[0_18px_45px_rgba(36,15,21,0.14)] lg:order-1 lg:sticky lg:top-32">
+            <img
+              src="/photos/AboutKhaki.jpg"
+              alt="Amanda standing in a khaki outfit"
+              className="h-full w-full object-cover object-[50%_34%]"
+            />
+          </figure>
+
+          <div className="order-1 flex flex-col gap-6 text-lg leading-relaxed text-femme-dark/75 md:text-xl font-system lg:order-2 lg:pt-10">
+            {storyParagraphs.map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+            <p className="mt-2 max-w-2xl text-3xl italic leading-snug text-femme-plum md:text-4xl">
+              <SafeText text={closingLine} />
+            </p>
+          </div>
         </motion.div>
 
         <motion.div
