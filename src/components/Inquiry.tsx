@@ -1,8 +1,10 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { trackEvent } from "../lib/analytics";
 import SafeText from "./SafeText";
+import { SERVICE_OPTIONS, NOT_SURE_LABEL, labelForSlug } from "../data/serviceOptions";
 
 const labelClass = "text-xs uppercase tracking-widest font-bold opacity-60 font-system";
 const inputClass =
@@ -13,9 +15,24 @@ const FORM_ACTION = import.meta.env.VITE_FORMSPREE_ENDPOINT || "";
 type SubmitState = "idle" | "loading" | "success" | "error";
 
 export default function Inquiry() {
+  const location = useLocation();
   const [hasVenue, setHasVenue] = useState(false);
   const [state, setState] = useState<SubmitState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  // Prefilled from `?service=<slug>` when a visitor clicks a Services card;
+  // defaults to "Not sure yet" for anyone who reaches the form directly.
+  const [selectedService, setSelectedService] = useState(
+    () => labelForSlug(new URLSearchParams(location.search).get("service")) || NOT_SURE_LABEL,
+  );
+
+  // Keep the dropdown mirroring the URL's ?service= param across every SPA
+  // navigation: clicking a different package's "Book Now", and also Back/Forward
+  // or an invalid/removed slug — both reset to the neutral fallback so the form
+  // never shows a stale package the URL no longer reflects.
+  useEffect(() => {
+    const label = labelForSlug(new URLSearchParams(location.search).get("service"));
+    setSelectedService(label || NOT_SURE_LABEL);
+  }, [location.search]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,8 +66,9 @@ export default function Inquiry() {
       if (res.ok) {
         setState("success");
         form.reset();
-        // Conversion signal only — no form-field contents are ever sent.
-        trackEvent("inquiry_submit", { location: "inquiry_form" });
+        // Conversion signal only — selected package is a non-personal category,
+        // never the visitor's name, email, or message.
+        trackEvent("inquiry_submit", { location: "inquiry_form", service: selectedService });
       } else {
         throw new Error(`Server responded with ${res.status}`);
       }
@@ -161,6 +179,27 @@ export default function Inquiry() {
         <div className="flex flex-col gap-2">
           <label htmlFor="email" className={labelClass}>Email</label>
           <input id="email" name="email" type="email" required className={inputClass} disabled={submitting} />
+        </div>
+
+        {/* Interested Service — prefilled from the clicked Services card (#95),
+            editable here, and sent to Formspree as `interestedService`. */}
+        <div className="flex flex-col gap-2">
+          <label htmlFor="interestedService" className={labelClass}>Interested Service</label>
+          <select
+            id="interestedService"
+            name="interestedService"
+            value={selectedService}
+            onChange={(e) => setSelectedService(e.target.value)}
+            className={inputClass}
+            disabled={submitting}
+          >
+            {SERVICE_OPTIONS.map((option) => (
+              <option key={option.slug} value={option.label}>
+                {option.label}
+              </option>
+            ))}
+            <option value={NOT_SURE_LABEL}>{NOT_SURE_LABEL}</option>
+          </select>
         </div>
 
         {/* Event Date + Guest Count */}

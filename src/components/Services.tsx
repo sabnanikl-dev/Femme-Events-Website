@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import CarouselDots from "./CarouselDots";
 import { useCarouselIndex } from "../lib/useCarouselIndex";
 import { trackEvent } from "../lib/analytics";
 import SafeText from "./SafeText";
+import { inquiryHrefForLabel } from "../data/serviceOptions";
 
 const services = [
   {
@@ -95,6 +97,11 @@ function ServiceCard({
   index: number;
 }) {
   const [hovered, setHovered] = useState(false);
+  const navigate = useNavigate();
+
+  // Carries the clicked package to the inquiry form via the URL, e.g.
+  // `/?service=the-full-femme#inquiry`, so the form can prefill it.
+  const inquiryHref = inquiryHrefForLabel(service.title);
 
   return (
     <motion.div
@@ -166,10 +173,25 @@ function ServiceCard({
           </p>
         </div>
 
-        {/* Book Now button — links to inquiry section */}
+        {/* Book Now button — carries the selected package to the inquiry form.
+            The real href keeps no-JS fallback and modified-click (open in new
+            tab/window) working; a plain left-click does a client-side navigation
+            instead so visitors don't pay for a full reload. */}
         <motion.a
-          href="#inquiry"
-          onClick={() => trackEvent("cta_inquiry_click", { location: "service_card", service: service.title })}
+          href={inquiryHref}
+          onClick={(e) => {
+            // Let the browser handle modified clicks via the real href so
+            // Cmd/Ctrl/Shift-click still opens the form in a new tab/window.
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+            e.preventDefault();
+            trackEvent("cta_inquiry_click", { location: "service_card", service: service.title });
+            navigate(inquiryHref);
+            // Scroll explicitly: switching packages while already at #inquiry is
+            // a search-only URL change, so ScrollToHash (keyed on pathname/hash)
+            // won't re-fire. The section always exists on the home page, and
+            // the global scroll-padding-top keeps it clear of the navbar.
+            document.getElementById("inquiry")?.scrollIntoView();
+          }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           aria-label={`Book ${service.title} — jump to inquiry form`}
