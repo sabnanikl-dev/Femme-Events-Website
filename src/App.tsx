@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Suspense, lazy } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Suspense, lazy, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
@@ -22,6 +22,31 @@ const BlogIndex = lazy(() => import("./pages/BlogIndex"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const WhatHappensNextPage = lazy(() => import("./pages/WhatHappensNext"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
+
+// On a full-page load (or client navigation) to a "/#section" URL, the browser
+// tries to scroll to the fragment before React has rendered the target, so the
+// scroll is lost and the page stays at the top. Re-run the scroll, retrying for
+// a few frames until the target element exists.
+function ScrollToHash() {
+  const { pathname, hash } = useLocation();
+  useEffect(() => {
+    if (!hash) return;
+    const id = hash.slice(1);
+    let raf = 0;
+    let attempts = 0;
+    const scrollToTarget = () => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView();
+        return;
+      }
+      if (attempts++ < 20) raf = requestAnimationFrame(scrollToTarget);
+    };
+    raf = requestAnimationFrame(scrollToTarget);
+    return () => cancelAnimationFrame(raf);
+  }, [pathname, hash]);
+  return null;
+}
 
 function Home() {
   return (
@@ -41,6 +66,7 @@ function Home() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToHash />
       <Navbar />
       <Suspense fallback={<div className="min-h-screen bg-femme-cream" />}>
         <Routes>
