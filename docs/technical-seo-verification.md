@@ -7,7 +7,7 @@ This document records the technical SEO baseline for the Femme Events website an
 | Asset / route | Expected result | Notes |
 |---|---|---|
 | `/robots.txt` | `200`, `text/plain`, allows public crawl, points to `https://femmeevents.com/sitemap.xml` | Static file in `public/robots.txt`. |
-| `/sitemap.xml` | `200`, XML sitemap content type, includes current direct public routes | Includes `/`, `/about`, `/what-happens-next`, and `/journal`. `#services` and `#inquiry-form` are homepage sections, not standalone crawlable routes, so they are intentionally not separate sitemap entries until dedicated routes exist. Dynamic journal-post sitemap generation is deferred until published post inventory is stable. |
+| `/sitemap.xml` | `200`, XML sitemap content type, includes current self-canonical public routes | Includes `/` only until non-home SPA routes have route-specific canonical metadata. `#services` and `#inquiry-form` are homepage sections, not standalone crawlable routes, so they are intentionally not separate sitemap entries until dedicated routes exist. Dynamic journal-post sitemap generation is deferred until published post inventory is stable. |
 | `/og-image.png` | `200`, `image/png`, 1200×630 | Branded share image using approved Femme palette. |
 | Direct app routes | `/`, `/about`, `/what-happens-next`, `/journal` load without SPA fallback serving assets as HTML | Verify locally and again after deployment. |
 
@@ -19,6 +19,7 @@ Do not add these until the page has matching visible content and/or approved sou
 
 - `FAQPage` schema — visible FAQ copy exists, but schema publication should wait for a dedicated copy review so answers are exactly approved.
 - `BreadcrumbList` schema — no visible breadcrumb UI exists on the current routes.
+- Non-home route sitemap entries — defer `/about`, `/what-happens-next`, and `/journal` until they emit route-specific canonical metadata instead of the homepage canonical URL.
 - Review/rating/award claims — no approved visible evidence is present.
 - Public directory, GBP, or Search Console actions — out of repo scope and require explicit approval.
 

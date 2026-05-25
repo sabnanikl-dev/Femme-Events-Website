@@ -16,18 +16,34 @@ if (!robots.includes("Sitemap: https://femmeevents.com/sitemap.xml")) fail("robo
 const sitemap = read("public/sitemap.xml");
 const requiredUrls = [
   "https://femmeevents.com/",
-  "https://femmeevents.com/about",
-  "https://femmeevents.com/what-happens-next",
-  "https://femmeevents.com/journal",
 ];
 for (const url of requiredUrls) {
   if (!sitemap.includes(`<loc>${url}</loc>`)) fail(`sitemap.xml is missing ${url}`);
 }
+const deferredUrls = [
+  "https://femmeevents.com/about",
+  "https://femmeevents.com/what-happens-next",
+  "https://femmeevents.com/journal",
+];
+for (const url of deferredUrls) {
+  if (sitemap.includes(`<loc>${url}</loc>`)) {
+    fail(`sitemap.xml should not include ${url} until it has route-specific canonical metadata`);
+  }
+}
 if (sitemap.includes("#")) fail("sitemap.xml should not include fragment-only homepage sections");
 
-const og = statSync(new URL("public/og-image.png", root));
+const ogImagePath = "public/og-image.png";
+const og = statSync(new URL(ogImagePath, root));
 if (og.size < 10_000) fail("og-image.png exists but is unexpectedly small");
-if (extname("public/og-image.png") !== ".png") fail("OG image should be PNG");
+if (extname(ogImagePath) !== ".png") fail("OG image should be PNG");
+const ogImage = readFileSync(new URL(ogImagePath, root));
+const pngSignature = "89504e470d0a1a0a";
+if (ogImage.subarray(0, 8).toString("hex") !== pngSignature) fail("og-image.png must be a valid PNG file");
+const ogWidth = ogImage.readUInt32BE(16);
+const ogHeight = ogImage.readUInt32BE(20);
+if (ogWidth !== 1200 || ogHeight !== 630) {
+  fail(`og-image.png must be 1200x630, got ${ogWidth}x${ogHeight}`);
+}
 
 const html = read("index.html");
 for (const snippet of [
