@@ -6,8 +6,6 @@ export interface Testimonial {
 
 // Intentionally empty until real client testimonials are collected. Testimonials
 // are managed in Sanity (the "Testimonial" document type) so Amanda can add them
-// self-serve. While both this list and the CMS are empty, the Testimonials
-// section hides itself (see src/components/Testimonials.tsx) rather than showing
-// placeholder reviews. Adding entries in Sanity makes the section reappear
-// automatically — no code change or redeploy required.
+// self-serve. The public site reads Sanity directly and hides the section when
+// the CMS has no testimonials.
 export const testimonials: Testimonial[] = [];

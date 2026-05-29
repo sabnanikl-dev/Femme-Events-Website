@@ -3,7 +3,7 @@
 Marketing site for **Femme Events** — an Atlanta-based wedding coordination and
 design studio. Built with React + TypeScript on Vite, styled with Tailwind CSS,
 with journal/blog, testimonials, and vendor content served from Sanity CMS
-(with static fallbacks).
+without static fallback content.
 
 ## Tech stack
 
@@ -40,7 +40,7 @@ Vercel project (Production + Preview).
 | Variable | Purpose |
 |----------|---------|
 | `VITE_FORMSPREE_ENDPOINT` | Inquiry form submission endpoint |
-| `VITE_SANITY_PROJECT_ID` | Sanity project ID (unset → static fallback content) |
+| `VITE_SANITY_PROJECT_ID` | Sanity project ID (unset → CMS-backed sections render empty states) |
 | `VITE_SANITY_DATASET` | Sanity dataset (default `production`) |
 | `VITE_SANITY_API_VERSION` | Sanity API version (default `2024-01-01`) |
 | `VITE_PLAUSIBLE_DOMAIN` / `VITE_GA4_MEASUREMENT_ID` | Optional analytics (see `docs/analytics.md`) |

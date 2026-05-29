@@ -6,7 +6,6 @@ import {
   type Vendor,
   type VendorCategory,
 } from "../lib/vendors";
-import { vendorCategories as fallbackCategories } from "../data/vendors";
 import VendorOverlayCard from "./ui/VendorOverlayCard";
 import { trackEvent } from "../lib/analytics";
 import SafeText from "./SafeText";
@@ -60,7 +59,7 @@ function VendorCard({
 
 export default function Vendors() {
   const [categories, setCategories] = useState<VendorCategory[]>(
-    () => getInitialVendorCategories() ?? fallbackCategories,
+    () => getInitialVendorCategories() ?? [],
   );
   const [errored, setErrored] = useState(false);
   const [selected, setSelected] = useState<SelectedVendor | null>(null);

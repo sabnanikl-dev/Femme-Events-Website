@@ -1,5 +1,5 @@
 // Sanity image URL helpers. These only modify Sanity CDN URLs;
-// non-Sanity URLs (e.g. the `/photos/*.jpg` static fallbacks) are
+// non-Sanity URLs (e.g. legacy `/photos/*.jpg` images) are
 // passed through untouched so callers can safely use these helpers
 // against either source.
 
