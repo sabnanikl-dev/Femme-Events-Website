@@ -150,7 +150,8 @@ export default function BlogIndex() {
     [posts],
   );
 
-  if (!posts || posts.length === 0) {
+  // posts === null → Sanity fetch still in flight (loading).
+  if (posts === null) {
     return (
       <div className="min-h-screen bg-femme-cream pt-40 px-6 md:px-24">
         <p className="text-femme-dark/40 font-system">Loading the journal…</p>
@@ -158,6 +159,8 @@ export default function BlogIndex() {
     );
   }
 
+  // posts.length === 0 → intentional empty Journal (no CMS posts yet).
+  const isEmpty = posts.length === 0;
   const featured = posts[0];
   const rest = posts.slice(1);
   const filtered = activeCategory === "All"
@@ -189,64 +192,92 @@ export default function BlogIndex() {
         </motion.div>
       </section>
 
-      {/* Featured post */}
-      <section className="py-14 px-6 md:px-24">
-        <p className="text-xs uppercase tracking-widest font-bold text-femme-dark/35 font-system mb-6">
-          Latest Story
-        </p>
-        <FeaturedPost post={featured} />
-      </section>
-
-      {/* Category filter + grid */}
-      <section className="px-6 md:px-24 pb-24">
-        {/* Divider + filter */}
-        <div className="flex flex-wrap items-center gap-2 border-t border-femme-plum/10 pt-10 mb-12">
-          <p className="text-xs uppercase tracking-widest font-bold text-femme-dark/35 font-system mr-4">
-            Browse by
-          </p>
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest font-system transition-colors duration-200 cursor-pointer border ${
-                activeCategory === cat
-                  ? "bg-femme-plum text-white border-femme-plum"
-                  : "bg-transparent text-femme-dark/55 border-femme-dark/15 hover:border-femme-plum hover:text-femme-plum"
-              }`}
+      {isEmpty ? (
+        /* Intentional empty state — Journal exists but has no posts yet. */
+        <section className="py-24 px-6 md:px-24 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="max-w-xl mx-auto flex flex-col items-center gap-5"
+          >
+            <h2 className="text-4xl md:text-5xl text-femme-dark italic leading-tight">
+              New stories are on the way
+            </h2>
+            <p className="text-femme-dark/55 text-lg font-system leading-relaxed">
+              We're putting together honest planning advice and real wedding
+              stories. Check back soon — there's plenty coming.
+            </p>
+            <Link
+              to="/#inquiry-form"
+              className="inline-flex items-center gap-2 text-femme-plum font-bold text-sm uppercase tracking-widest font-system hover:gap-4 transition-all duration-200 mt-2"
             >
-              {cat}
-            </button>
-          ))}
-        </div>
+              Start Planning With Us <ArrowRight size={15} strokeWidth={2.5} />
+            </Link>
+          </motion.div>
+        </section>
+      ) : (
+        <>
+          {/* Featured post */}
+          <section className="py-14 px-6 md:px-24">
+            <p className="text-xs uppercase tracking-widest font-bold text-femme-dark/35 font-system mb-6">
+              Latest Story
+            </p>
+            <FeaturedPost post={featured} />
+          </section>
 
-        {/* Post grid */}
-        <AnimatePresence mode="wait">
-          {filtered.length > 0 ? (
-            <motion.div
-              key={activeCategory}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="grid md:grid-cols-2 gap-x-12 gap-y-0"
-            >
-              {filtered.map((post, index) => (
-                <PostCard key={post.slug} post={post} index={index} />
+          {/* Category filter + grid */}
+          <section className="px-6 md:px-24 pb-24">
+            {/* Divider + filter */}
+            <div className="flex flex-wrap items-center gap-2 border-t border-femme-plum/10 pt-10 mb-12">
+              <p className="text-xs uppercase tracking-widest font-bold text-femme-dark/35 font-system mr-4">
+                Browse by
+              </p>
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest font-system transition-colors duration-200 cursor-pointer border ${
+                    activeCategory === cat
+                      ? "bg-femme-plum text-white border-femme-plum"
+                      : "bg-transparent text-femme-dark/55 border-femme-dark/15 hover:border-femme-plum hover:text-femme-plum"
+                  }`}
+                >
+                  {cat}
+                </button>
               ))}
-            </motion.div>
-          ) : (
-            <motion.p
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-femme-dark/40 font-system py-16 text-center"
-            >
-              No posts in this category yet — check back soon.
-            </motion.p>
-          )}
-        </AnimatePresence>
-      </section>
+            </div>
+
+            {/* Post grid */}
+            <AnimatePresence mode="wait">
+              {filtered.length > 0 ? (
+                <motion.div
+                  key={activeCategory}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="grid md:grid-cols-2 gap-x-12 gap-y-0"
+                >
+                  {filtered.map((post, index) => (
+                    <PostCard key={post.slug} post={post} index={index} />
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.p
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-femme-dark/40 font-system py-16 text-center"
+                >
+                  No posts in this category yet — check back soon.
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </section>
+        </>
+      )}
     </div>
   );
 }
