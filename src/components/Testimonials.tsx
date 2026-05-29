@@ -5,14 +5,13 @@ import {
   getTestimonials,
   type Testimonial,
 } from "../lib/testimonials";
-import { testimonials as fallbackTestimonials } from "../data/testimonials";
 import { useCarouselIndex } from "../lib/useCarouselIndex";
 import CarouselDots from "./CarouselDots";
 import SafeText from "./SafeText";
 
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(
-    () => getInitialTestimonials() ?? fallbackTestimonials,
+    () => getInitialTestimonials() ?? [],
   );
 
   useEffect(() => {
@@ -29,10 +28,9 @@ export default function Testimonials() {
     testimonials.length,
   );
 
-  // No real testimonials yet (empty CMS + empty fallback): hide the whole
-  // section instead of rendering an empty "Kind Words" header. It reappears
-  // automatically once entries are added in Sanity. Placed after all hooks so
-  // the Rules of Hooks are respected.
+  // No real testimonials yet: hide the whole section instead of rendering an
+  // empty "Kind Words" header. It reappears automatically once entries are
+  // added in Sanity.
   if (testimonials.length === 0) return null;
 
   return (

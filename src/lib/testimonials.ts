@@ -1,5 +1,5 @@
 import { sanityClient } from "./sanity";
-import { testimonials as fallbackTestimonials, type Testimonial } from "../data/testimonials";
+import type { Testimonial } from "../data/testimonials";
 
 export type { Testimonial };
 
@@ -12,17 +12,14 @@ const TESTIMONIALS_QUERY = `*[_type == "testimonial"] | order(coalesce(order, 99
 }`;
 
 export function getInitialTestimonials(): Testimonial[] | null {
-  return sanityClient ? null : fallbackTestimonials;
+  return sanityClient ? null : [];
 }
 
 export async function getTestimonials(): Promise<Testimonial[]> {
-  if (!sanityClient) return fallbackTestimonials;
+  if (!sanityClient) return [];
   try {
-    const result = await sanityClient.fetch<Testimonial[]>(TESTIMONIALS_QUERY);
-    // Empty CMS falls back to the static list (currently empty). When both are
-    // empty the section hides itself rather than showing placeholder reviews.
-    return result.length > 0 ? result : fallbackTestimonials;
+    return await sanityClient.fetch<Testimonial[]>(TESTIMONIALS_QUERY);
   } catch {
-    return fallbackTestimonials;
+    return [];
   }
 }
