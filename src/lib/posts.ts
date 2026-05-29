@@ -37,18 +37,29 @@ const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   body
 }`;
 
-// Sync helpers for the initial render: when Sanity is disabled we resolve
-// from the static fallback immediately, preserving today's no-flash UX.
-// When Sanity is enabled, the initial render returns the "still loading"
-// shape and the async fetch fills in.
+// The static posts in src/data/posts.ts are demo/seed data only. They must
+// never appear on the public website (where Sanity is always configured) —
+// see issue #152. They are used solely for local development when Sanity is
+// not wired up AND the developer explicitly opts in via VITE_USE_DEMO_POSTS.
+const demoPosts: Post[] =
+  !sanityClient && import.meta.env.VITE_USE_DEMO_POSTS === "true"
+    ? fallbackPosts
+    : [];
+
+// Sync helpers for the initial render:
+// - Sanity enabled  → return the "still loading" shape (null / undefined);
+//   the async fetch fills in the real result.
+// - Sanity disabled → resolve from the demo seed immediately (empty unless
+//   the developer opted in), preserving the no-flash UX without ever
+//   surfacing placeholders on the public site.
 
 export function getInitialPosts(): Post[] | null {
-  return sanityClient ? null : fallbackPosts;
+  return sanityClient ? null : demoPosts;
 }
 
 export function getInitialPost(slug: string): Post | null | undefined {
   if (sanityClient) return undefined;
-  return fallbackPosts.find((p) => p.slug === slug) ?? null;
+  return demoPosts.find((p) => p.slug === slug) ?? null;
 }
 
 export function formatPostDate(date: string): string {
@@ -66,21 +77,25 @@ export function formatPostDate(date: string): string {
 }
 
 export async function getPosts(): Promise<Post[]> {
-  if (!sanityClient) return fallbackPosts;
+  if (!sanityClient) return demoPosts;
   try {
     return await sanityClient.fetch<Post[]>(POSTS_QUERY);
   } catch {
-    return fallbackPosts;
+    // CMS configured but unreachable: treat as "no journal posts yet" rather
+    // than surfacing static placeholders on the public site (issue #152).
+    return [];
   }
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
   if (!sanityClient) {
-    return fallbackPosts.find((p) => p.slug === slug) ?? null;
+    return demoPosts.find((p) => p.slug === slug) ?? null;
   }
   try {
     return await sanityClient.fetch<Post | null>(POST_QUERY, { slug });
   } catch {
-    return fallbackPosts.find((p) => p.slug === slug) ?? null;
+    // CMS configured but unreachable: don't render the static placeholder for
+    // an old slug — let the caller redirect to /journal (issue #152).
+    return null;
   }
 }
