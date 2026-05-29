@@ -69,8 +69,8 @@ export default function Vendors() {
     getVendorCategories()
       .then((data) => {
         if (cancelled) return;
-        if (data.length === 0) setErrored(true);
-        else setCategories(data);
+        setErrored(false);
+        setCategories(data);
       })
       .catch(() => {
         if (!cancelled) setErrored(true);
