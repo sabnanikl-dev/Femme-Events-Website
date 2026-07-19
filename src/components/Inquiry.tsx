@@ -194,6 +194,22 @@ export default function Inquiry() {
           <input id="email" name="email" type="email" required className={inputClass} disabled={submitting} />
         </div>
 
+        {/* Phone — sent to Formspree as `phone`; intentionally no strict pattern
+            so common domestic and international formats are all accepted (#157). */}
+        <div className="flex flex-col gap-2">
+          <label htmlFor="phone" className={labelClass}>Phone Number</label>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            required
+            className={inputClass}
+            disabled={submitting}
+          />
+        </div>
+
         {/* Interested Service — prefilled from the clicked Services card (#95),
             editable here, and sent to Formspree as `interestedService`. */}
         <div className="flex flex-col gap-2">
