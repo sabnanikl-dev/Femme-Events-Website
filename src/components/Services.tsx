@@ -6,6 +6,7 @@ import { useCarouselIndex } from "../lib/useCarouselIndex";
 import { trackEvent } from "../lib/analytics";
 import SafeText from "./SafeText";
 import { inquiryHrefForLabel } from "../data/serviceOptions";
+import { slugForLabel } from "../lib/measurement/index.ts";
 
 const services = [
   {
@@ -187,7 +188,11 @@ function ServiceCard({
             // Cmd/Ctrl/Shift-click still opens the form in a new tab/window.
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
             e.preventDefault();
-            trackEvent("cta_inquiry_click", { location: "service_card", service: service.title });
+            // The allowlist takes canonical package slugs, never display labels.
+            trackEvent("cta_inquiry_click", {
+              location: "service_card",
+              service: slugForLabel(service.title),
+            });
             navigate(inquiryHref);
             // Scroll explicitly: switching packages while already at the form
             // anchor is a search-only URL change, so ScrollToHash (keyed on

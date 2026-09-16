@@ -7,6 +7,12 @@
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "verify:seo": "node scripts/verify-seo-assets.mjs",
+    "test:measurement": "node scripts/run-measurement-tests.mjs",
+    "test:measurement:browser": "playwright test --config=tests/browser/playwright.config.ts",
+    "dev:measurement-fixture": "vite --mode measurement-fixture --port 4317 --strictPort --host 127.0.0.1",
+    "dev:measurement-ambient-check": "VITE_GA4_MEASUREMENT_ID=G-AMBIENT0000 vite --mode production --port 4318 --strictPort --host 127.0.0.1",
+    "build:measurement-ambient-check": "VITE_GA4_MEASUREMENT_ID=G-AMBIENT0000 vite build --mode production --outDir dist-measurement-ambient",
+    "preview:measurement-ambient-check": "vite preview --outDir dist-measurement-ambient --port 4319 --strictPort --host 127.0.0.1",
     "og:image": "node scripts/generate-og-image.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "preview": "vite preview",
@@ -25,6 +31,7 @@
     "react-router-dom": "^7.14.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^22.14.0",
     "@types/react": "^19.2.14",

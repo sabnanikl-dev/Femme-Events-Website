@@ -2,6 +2,8 @@ node_modules/
 .DS_Store
 *.log
 dist/
+# Compiled artifact used only by the measurement production-gate fixtures
+dist-measurement-ambient/
 .env
 
 # Playwright MCP review artifacts (console logs + page snapshots)
@@ -10,3 +12,7 @@ dist/
 # Python bytecode (from agent tooling scripts)
 __pycache__/
 *.pyc
+
+# Playwright fixture output (screenshots, traces)
+test-results/
+playwright-report/

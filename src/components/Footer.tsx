@@ -1,4 +1,5 @@
 import { trackEvent } from "../lib/analytics";
+import { measurement, openConsentUi } from "../lib/measurement/index.ts";
 
 export default function Footer() {
   return (
@@ -50,9 +51,24 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="mt-8 pt-6 border-t border-femme-plum/5 flex justify-between items-center text-xs uppercase tracking-widest font-bold opacity-30 font-system">
-        <span>&copy; 2026 Femme Events</span>
-        <span>All Rights Reserved</span>
+      <div className="mt-8 pt-6 border-t border-femme-plum/5 flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-widest font-bold font-system">
+        <span className="opacity-30">&copy; 2026 Femme Events</span>
+        {/* Persistent way back to the analytics choice (issue #161). Rendered
+            only when the build is actually eligible to measure, so the live,
+            hard-disabled build shows no control for something it never does. */}
+        {measurement.isEligible() && (
+          <button
+            type="button"
+            data-testid="footer-analytics-preferences"
+            onClick={(event) => openConsentUi(event.currentTarget)}
+            className="inline-flex min-h-[44px] items-center text-femme-dark/60 underline underline-offset-4
+              transition-colors duration-200 hover:text-femme-plum focus-visible:outline-2
+              focus-visible:outline-offset-2 focus-visible:outline-femme-plum"
+          >
+            Analytics preferences
+          </button>
+        )}
+        <span className="opacity-30">All Rights Reserved</span>
       </div>
     </footer>
   );

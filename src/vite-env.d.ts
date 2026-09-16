@@ -8,6 +8,8 @@ interface ImportMetaEnv {
   readonly VITE_PLAUSIBLE_DOMAIN?: string;
   readonly VITE_PLAUSIBLE_API_HOST?: string;
   readonly VITE_GA4_MEASUREMENT_ID?: string;
+  /** Local-only inert measurement fixture opt-in. Never set in production. */
+  readonly VITE_MEASUREMENT_FIXTURE?: string;
 }
 
 interface ImportMeta {
