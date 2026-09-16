@@ -2,9 +2,10 @@
  * Generates public/og-image.png — the 1200x630 social link-preview graphic.
  *
  * The wordmark is NOT retyped. It is read at build time from the approved brand
- * source `public/logo-nav.svg` (the same asset used by the site navbar, the
- * favicon, and the JSON-LD `logo` property) and nested as vector paths, so the
- * preview always matches the shipped logo exactly.
+ * source `public/logo-nav.svg` (the same asset used by the site navbar) and
+ * nested as vector paths, so the preview always matches the shipped logo
+ * exactly. The favicon/app-icon set and the JSON-LD `logo` property come from
+ * the footer logo instead — see scripts/generate-icons.mjs.
  *
  * Supporting type uses Frunchy Sage (the site's `--font-display`, used for the
  * homepage H1) and the approved palette from src/index.css.

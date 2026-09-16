@@ -8,6 +8,7 @@
     "build": "vite build",
     "verify:seo": "node scripts/verify-seo-assets.mjs",
     "og:image": "node scripts/generate-og-image.mjs",
+    "icons": "node scripts/generate-icons.mjs",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
