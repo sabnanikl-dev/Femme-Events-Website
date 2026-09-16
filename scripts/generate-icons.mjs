@@ -11,21 +11,37 @@
  * content occupies exactly 126x126 units (x 63..189, y 9..135) — the artwork is
  * already square, surrounded by empty padding. This script measures that
  * content box at build time (Resvg#getBBox), squares it up defensively, and
- * uses it as the icon frame. No artwork is added, moved, or removed.
+ * uses it as the icon frame. Source artwork is unchanged; browser/search
+ * output additionally receives the approved circular clip described below.
  *
- * CANVAS: icons are flattened onto --color-femme-cream (#f7edf0) from the
- * approved palette in src/index.css. The source SVG has a transparent
- * background; an opaque canvas is required because iOS composites
- * apple-touch-icon over black, and a transparent favicon would drop the dark
- * brown wordmark into invisibility on dark browser chrome.
+ * CANVAS: the artwork always sits on --color-femme-cream (#f7edf0) from the
+ * approved palette in src/index.css, because the source SVG is transparent and
+ * the dark brown wordmark would vanish against dark browser chrome. The shape
+ * of that canvas differs by audience:
+ *
+ *   - Browser / search icons (favicon-16x16, -32x32, -48x48 and every
+ *     favicon.ico frame) get a cream DISC inscribed in the content square, with
+ *     transparent corners, so the site icon reads as a round mark in tab strips
+ *     and search results rather than a pale square. The artwork is clipped to
+ *     that same circle, so the outer corners of the bloom fall outside it; the
+ *     wordmark runs horizontally across the circle's widest axis and stays
+ *     uncut. This treatment was reviewed and approved for issue #150.
+ *   - App icons (apple-touch-icon, android-chrome-192/512) stay an OPAQUE
+ *     CREAM SQUARE, unchanged. iOS composites apple-touch-icon over black and
+ *     applies its own corner mask, and the 512px file is also the JSON-LD
+ *     `logo`, which we deliberately keep as the approved opaque square.
+ *
+ * Either way the pixel dimensions stay square — only the painted region changes.
  *
  * LEGIBILITY LIMIT (documented, not worked around): the wordmark is five
  * letters spanning ~78% of the square. At 16x16 that is ~2.5 device pixels per
  * letter, so the individual letterforms physically cannot resolve — the 16px
  * frame reads as the brand's pink bloom with a dark wordmark bar. That is a
- * raster limit, not a generation bug. The larger frames (48px+, which is what
- * Google's favicon crawler and the SERP logo slot actually use) do resolve the
- * wordmark. We deliberately do not substitute a different, invented mark.
+ * raster limit, not a generation bug. The larger frames do resolve the
+ * wordmark, which is why this set ships 64 and 128px .ico frames: Google
+ * recommends a square favicon larger than 48px and
+ * then decides for itself what, if anything, it shows in a result. We
+ * deliberately do not substitute a different, invented mark.
  *
  * Deps: only @resvg/resvg-js (already used by scripts/generate-og-image.mjs).
  * The .ico container is assembled here from plain buffers — no icon library.
@@ -46,20 +62,25 @@ const SOURCE = "public/logo-footer.svg";
 
 const PNG_SIGNATURE = "89504e470d0a1a0a";
 
-/** Standalone PNG icons written to public/. */
+/**
+ * Standalone PNG icons written to public/. `circular: true` marks the
+ * browser/search icons that get the cream disc with transparent corners; the
+ * app icons stay an opaque cream square.
+ */
 const PNG_TARGETS = [
-  { file: "favicon-16x16.png", size: 16 },
-  { file: "favicon-32x32.png", size: 32 },
-  { file: "favicon-48x48.png", size: 48 },
+  { file: "favicon-16x16.png", size: 16, circular: true },
+  { file: "favicon-32x32.png", size: 32, circular: true },
+  { file: "favicon-48x48.png", size: 48, circular: true },
   { file: "apple-touch-icon.png", size: 180 },
   { file: "android-chrome-192x192.png", size: 192 },
   { file: "android-chrome-512x512.png", size: 512 },
 ];
 
 /**
- * Frames packed into favicon.ico. 16/32 are the classic tab sizes; 48 is the
- * size Google documents for the search-result favicon; 64/128 keep the file
- * crisp on HiDPI tabs and Windows shortcuts.
+ * Frames packed into favicon.ico — all browser/search surfaces, so all
+ * circular. 16/32 are classic tab sizes; 48 is another common raster size,
+ * and 64/128 cover Google's recommended "larger than 48px"
+ * guidance plus HiDPI tabs and Windows shortcuts.
  */
 const ICO_FRAMES = [16, 32, 48, 64, 128];
 
@@ -101,15 +122,41 @@ const frameY = bbox.y + bbox.height / 2 - side / 2;
 const round2 = (n) => Math.round(n * 100) / 100;
 const viewBox = `${round2(frameX)} ${round2(frameY)} ${round2(side)} ${round2(side)}`;
 
-/** Renders the approved artwork, reframed to its square content box. */
-const renderSquare = (size) => {
-  const svg =
+// The disc inscribed in the content square: touches each edge at its midpoint,
+// so it is the largest circle that keeps the frame's composition centred.
+const discCx = round2(frameX + side / 2);
+const discCy = round2(frameY + side / 2);
+const discR = round2(side / 2);
+// Namespaced so it cannot collide with an id inside the nested source markup.
+const CLIP_ID = "femme-icon-disc-clip";
+
+/**
+ * Renders the approved artwork, reframed to its square content box.
+ *
+ * `circular` swaps the opaque cream background for a cream disc drawn inside
+ * the SVG: the cream fill and the artwork share one clipPath, so there is a
+ * single anti-aliased circle edge and everything outside it stays transparent.
+ * Both variants render at `size` x `size` pixels.
+ */
+const renderSquare = (size, { circular = false } = {}) => {
+  const open =
     `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ` +
-    `width="${size}" height="${size}" viewBox="${viewBox}">${logoInner}</svg>`;
+    `width="${size}" height="${size}" viewBox="${viewBox}">`;
+
+  const svg = circular
+    ? `${open}<defs><clipPath id="${CLIP_ID}">` +
+      `<circle cx="${discCx}" cy="${discCy}" r="${discR}"/></clipPath></defs>` +
+      `<g clip-path="url(#${CLIP_ID})">` +
+      `<rect x="${round2(frameX)}" y="${round2(frameY)}" ` +
+      `width="${round2(side)}" height="${round2(side)}" fill="${CREAM}"/>` +
+      `${logoInner}</g></svg>`
+    : `${open}${logoInner}</svg>`;
 
   const png = new Resvg(svg, {
     fitTo: { mode: "width", value: size },
-    background: CREAM,
+    // Circular icons paint their own cream disc; an opaque canvas here would
+    // fill the corners back in.
+    ...(circular ? {} : { background: CREAM }),
   })
     .render()
     .asPng();
@@ -164,15 +211,20 @@ console.log(
   `Content box: ${round2(bbox.x)},${round2(bbox.y)} ${round2(bbox.width)}x${round2(bbox.height)} → icon viewBox "${viewBox}"`,
 );
 
-for (const { file, size } of PNG_TARGETS) {
-  const png = renderSquare(size);
+for (const { file, size, circular = false } of PNG_TARGETS) {
+  const png = renderSquare(size, { circular });
   writeFileSync(p(`public/${file}`), png);
-  console.log(`Wrote public/${file} (${size}x${size}, ${png.length} bytes)`);
+  console.log(
+    `Wrote public/${file} (${size}x${size}, ${circular ? "circular disc" : "opaque square"}, ${png.length} bytes)`,
+  );
 }
 
-const icoFrames = ICO_FRAMES.map((size) => ({ size, png: renderSquare(size) }));
+const icoFrames = ICO_FRAMES.map((size) => ({
+  size,
+  png: renderSquare(size, { circular: true }),
+}));
 const ico = buildIco(icoFrames);
 writeFileSync(p("public/favicon.ico"), ico);
 console.log(
-  `Wrote public/favicon.ico (${ico.length} bytes, frames: ${ICO_FRAMES.join(", ")})`,
+  `Wrote public/favicon.ico (${ico.length} bytes, circular frames: ${ICO_FRAMES.join(", ")})`,
 );
