@@ -55,7 +55,18 @@ async function submitFromDocumentA(page: Page, app: BfcacheApp): Promise<InFligh
 
   await fillInquiry(page);
   await page.selectOption("#interestedService", "In Your Corner");
-  await page.getByRole("button", { name: "Send Inquiry" }).click({ noWaitAfter: true });
+  // The submit button scrolls lazy media into view. Wait for those actual
+  // resources before starting the one request this regression holds. An earlier
+  // `networkidle` load state can already be satisfied before this scroll.
+  const submit = page.getByRole("button", { name: "Send Inquiry" });
+  await submit.scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => Array.from(document.images).every((image) => {
+    const box = image.getBoundingClientRect();
+    const visible = box.bottom > 0 && box.top < innerHeight && box.right > 0 && box.left < innerWidth;
+    return !visible || image.complete;
+  }));
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  await submit.click({ noWaitAfter: true });
   await app.waitForExchanges(1);
   await expect(page.getByRole("button", { name: "Sending..." })).toBeDisabled();
   // The request was formed with A's attribution, so there is something to mislabel.

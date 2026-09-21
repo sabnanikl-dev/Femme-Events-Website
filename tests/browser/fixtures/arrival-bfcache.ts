@@ -334,15 +334,27 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     await use(bfcacheServer);
     bfcacheServer.reset();
   },
-  remoteRequestsFinished: async ({ page }, use) => {
+  remoteRequestsFinished: async ({ page }, use, testInfo) => {
     const finished: string[] = [];
+    const network: unknown[] = [];
+    page.on("request", (request) =>
+      network.push({ at: Date.now(), event: "request", url: request.url(), type: request.resourceType() }),
+    );
+    page.on("requestfailed", (request) =>
+      network.push({ at: Date.now(), event: "failed", url: request.url(), failure: request.failure() }),
+    );
+    page.on("framenavigated", (frame) => {
+      if (frame === page.mainFrame()) network.push({ at: Date.now(), event: "navigation", url: frame.url() });
+    });
     // Observation only. Nothing is intercepted, fulfilled or aborted.
     page.on("requestfinished", (request) => {
       const url = request.url();
+      network.push({ at: Date.now(), event: "finished", url });
       if (!/^https?:/i.test(url)) return;
       if (new URL(url).hostname !== "127.0.0.1") finished.push(url);
     });
     await use(finished);
+    await testInfo.attach("network-observations", { body: JSON.stringify(network, null, 2), contentType: "application/json" });
   },
 });
 
