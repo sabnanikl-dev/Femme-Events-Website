@@ -1,4 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "fe/cd-issue-161-measurement-fixtures": false
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",

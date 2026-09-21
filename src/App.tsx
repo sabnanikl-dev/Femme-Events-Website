@@ -4,8 +4,8 @@
  */
 
 import { Suspense, lazy, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { trackPageview } from "./lib/analytics";
+import { BrowserRouter, Routes, Route, useLocation, useNavigationType } from "react-router-dom";
+import { measurement } from "./lib/measurement/index.ts";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
@@ -16,6 +16,7 @@ import Testimonials from "./components/Testimonials";
 import Vendors from "./components/Vendors";
 import FAQ from "./components/FAQ";
 import Inquiry from "./components/Inquiry";
+import ConsentNotice from "./components/ConsentNotice";
 
 // Journal routes are split out so homepage visitors don't pay to download
 // blog code on first load.
@@ -61,13 +62,17 @@ function ScrollToRouteTop() {
   return null;
 }
 
-// Records an SPA pageview on each route change (GA4 only — Plausible's script
-// auto-captures History API navigations). Rendered inside BrowserRouter.
+// Reports each route change to the measurement runtime, which decides whether
+// anything is counted. The raw search string is passed for source classification
+// only — it is never forwarded to the provider, and the pageview itself carries
+// a static route label. A query- or hash-only change (switching package) is not
+// a pageview; Back/Forward to a different pathname is.
 function RouteAnalytics() {
   const location = useLocation();
+  const navigationType = useNavigationType();
   useEffect(() => {
-    trackPageview(location.pathname + location.search);
-  }, [location.pathname, location.search]);
+    measurement.recordNavigation(location.pathname, location.search, navigationType);
+  }, [location.pathname, location.search, navigationType]);
   return null;
 }
 
@@ -103,6 +108,7 @@ export default function App() {
         </Routes>
       </Suspense>
       <Footer />
+      <ConsentNotice />
     </BrowserRouter>
   );
 }

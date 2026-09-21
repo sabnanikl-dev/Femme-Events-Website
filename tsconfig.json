@@ -23,6 +23,11 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["src", "vite.config.*"],
-  "exclude": ["node_modules", "dist", "studio"]
+  "include": ["src", "tests", "vite.config.*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "studio",
+    "tests/browser/fixtures/inert-tag.js"
+  ]
 }

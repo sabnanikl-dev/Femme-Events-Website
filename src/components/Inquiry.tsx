@@ -1,10 +1,16 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import { trackEvent } from "../lib/analytics";
 import SafeText from "./SafeText";
 import { SERVICE_OPTIONS, NOT_SURE_LABEL, labelForSlug } from "../data/serviceOptions";
+import {
+  createInquirySubmitter,
+  decideSourceFields,
+  inquiryErrorMessage,
+  measurement,
+  slugForLabel,
+} from "../lib/measurement/index.ts";
 
 const labelClass = "text-xs uppercase tracking-widest font-bold opacity-60 font-system";
 const inputClass =
@@ -34,6 +40,15 @@ export default function Inquiry() {
     setSelectedService(label || NOT_SURE_LABEL);
   }, [location.search]);
 
+  // One submitter per mounted form. It owns the synchronous in-flight latch,
+  // the 15s timeout/abort and the one-outcome-per-operation guarantee, so a
+  // re-render can never start or settle a second POST (issue #161).
+  const submitter = useMemo(
+    () => createInquirySubmitter({ endpoint: FORM_ACTION, fetchImpl: (input, init) => fetch(input, init) }),
+    [],
+  );
+  const submittingRef = useRef(false);
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -43,40 +58,58 @@ export default function Inquiry() {
       return;
     }
 
-    setState("loading");
-    setErrorMsg("");
+    // Synchronous guard, before any await: rapid submit/Enter/callback paths
+    // all bounce off this rather than queueing a duplicate request.
+    if (submittingRef.current || submitter.isInFlight()) return;
+    submittingRef.current = true;
 
     const form = e.currentTarget;
+    // Snapshot the request while every control is still enabled. Disabling the
+    // fields during submission must not be able to drop a value, and the source
+    // attached here is the submission-time snapshot, never a later one.
     const formData = new FormData(form);
     const data: Record<string, string> = {};
     formData.forEach((value, key) => {
       data[key] = value as string;
     });
+    const serviceSlug = slugForLabel(selectedService);
+    const sourceSnapshot = measurement.snapshotSource();
+    // Production source fields stay blocked on the separate Formspree retention
+    // decision (website #83): `FORMSPREE_SOURCE_FIELDS_APPROVED` is hard-false,
+    // so the only path that adds them is the local fixture mode pointed at a
+    // provably inert endpoint. Nothing is appended retroactively after
+    // acceptance - this is the submission-time snapshot.
+    const sourceFields = decideSourceFields(measurement.getConfig().mode, FORM_ACTION);
+    if (sourceSnapshot && sourceFields.allowed) {
+      data.source = sourceSnapshot.source;
+      data.medium = sourceSnapshot.medium;
+      data.campaign = sourceSnapshot.campaign;
+    }
 
-    try {
-      const res = await fetch(FORM_ACTION, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+    setState("loading");
+    setErrorMsg("");
 
-      if (res.ok) {
-        setState("success");
-        form.reset();
-        // Conversion signal only — selected package is a non-personal category,
-        // never the visitor's name, email, or message.
-        trackEvent("inquiry_submit", { location: "inquiry_form", service: selectedService });
-      } else {
-        throw new Error(`Server responded with ${res.status}`);
-      }
-    } catch (err) {
+    const outcome = await submitter.submit(data);
+    // A duplicate never owned the latch, so it must not release it either.
+    if (outcome.status === "duplicate") return;
+    submittingRef.current = false;
+
+    if (outcome.status !== "accepted") {
+      // Validation failure, non-2xx, network error and timeout all emit zero
+      // success events and leave every entry in place for a retry.
       setState("error");
-      setErrorMsg(
-        err instanceof Error ? err.message : "Something went wrong. Try again or email us directly."
-      );
+      setErrorMsg(inquiryErrorMessage(outcome));
+      return;
+    }
+
+    form.reset();
+    setState("success");
+    // Backend acceptance controls the success UI. Analytics is rechecked
+    // against consent separately and can never block or undo the confirmation.
+    try {
+      measurement.trackInquirySuccess(outcome.operationId, serviceSlug, sourceSnapshot);
+    } catch {
+      // A tracking failure must never turn an accepted inquiry into an error.
     }
   }
 
