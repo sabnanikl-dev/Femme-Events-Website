@@ -290,11 +290,19 @@ export function createGa4Adapter(options: Ga4AdapterOptions): Ga4Adapter {
     campaignApplied = false;
   }
 
+  /**
+   * Re-configures the page's campaign and route context together. The caller
+   * decides when either changed; with no campaign held and none to purge this
+   * is still a context refresh, because `config` is the only page context that
+   * traffic the tag originates itself will ever inherit.
+   */
   function setCampaign(source: SourceTuple | null, routeLabel: string): void {
     if (!started) return;
-    const params = campaignParams(source);
-    if (Object.keys(params).length === 0) return;
-    push(["config", measurementId, { send_page_view: false, ...contextParams(routeLabel), ...params }]);
+    push([
+      "config",
+      measurementId,
+      { send_page_view: false, ...contextParams(routeLabel), ...campaignParams(source) },
+    ]);
   }
 
   function sendPageview(routeLabel: string): void {

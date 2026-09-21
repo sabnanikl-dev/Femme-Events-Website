@@ -103,10 +103,13 @@ function hasEncodedUtmPrefix(rawKey: string): boolean {
 /**
  * Does this query contain a key that is campaign input once decoded?
  *
- * Used for input that is too long or too malformed to parse normally. A raw
- * substring scan is not enough on its own: `%75tm_source` contains no `utm_`,
- * so an oversized query spelled that way used to classify as "no campaign
- * input at all" and quietly preserve whatever attribution was already held.
+ * Used for input that is too long or too malformed to parse normally. Only
+ * keys are read. Campaign input is a matter of what a field is called, so text
+ * inside an unrelated value — `?note=…utm_source`, `?note=…gclid` — is ignored
+ * here exactly as it is in a query of ordinary length, and cannot clear
+ * attribution that is still valid. Keys are read decoded, though: a raw
+ * substring scan would miss `%75tm_source`, which contains no `utm_`, and
+ * quietly preserve whatever attribution was already held.
  *
  * Two bounded questions are asked of each key, and nothing is decoded twice:
  *
@@ -141,11 +144,7 @@ function looksSourceBearing(raw: string): boolean {
     }
     if (isSourceBearingKey(decoded)) return true;
   }
-  // Kept as a backstop so nothing this scan does not model becomes *less*
-  // strict than the raw check it replaces.
-  const lower = raw.toLowerCase();
-  if (lower.includes("utm_")) return true;
-  return CLICK_ID_KEYS.some((key) => lower.includes(key));
+  return false;
 }
 
 export type SourceClassification = "none" | "gbp" | "unsupported";

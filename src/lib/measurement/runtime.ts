@@ -99,7 +99,9 @@ export function createMeasurementRuntime(): MeasurementRuntime {
   /**
    * Arrival bookkeeping for this document, in memory. Source-derived state
    * before a choice stays volatile, so this is not written to session storage
-   * and a refusal leaves nothing behind either.
+   * and a refusal leaves nothing behind either. It is kept ahead of any stored
+   * record this document reads, so a new arrival never shares an ordinal with
+   * attribution that an earlier document wrote.
    */
   const ledger = createArrivalLedger();
 
@@ -116,6 +118,7 @@ export function createMeasurementRuntime(): MeasurementRuntime {
   let lastNavigationKey: string | null = null;
 
   let appliedSourceArrival = 0;
+  let appliedRouteLabel: string | null = null;
   const emittedSuccessOperations = new Set<string>();
   const listeners = new Set<() => void>();
 
@@ -145,12 +148,22 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     return routeLabelFor(currentPathname ?? locationOf().pathname);
   }
 
-  /** Re-applies or purges provider campaign context when source state changes. */
+  /**
+   * Re-applies or purges provider campaign context when source state changes,
+   * and refreshes the provider's route context when the route category does.
+   *
+   * The two travel in one `config` but are tracked separately: every navigation
+   * reaches this through the source checks, and provider-originated traffic
+   * inherits its page context from `config` alone, so an unchanged campaign
+   * must not leave the previous route's category configured.
+   */
   function syncCampaign(record: SourceRecord | null): void {
     const arrival = record ? record.arrival : 0;
-    if (arrival === appliedSourceArrival) return;
+    const routeLabel = activeRouteLabel();
+    if (arrival === appliedSourceArrival && routeLabel === appliedRouteLabel) return;
     appliedSourceArrival = arrival;
-    adapter?.setCampaign(record ? APPROVED_TUPLE : null, activeRouteLabel());
+    appliedRouteLabel = routeLabel;
+    adapter?.setCampaign(record ? APPROVED_TUPLE : null, routeLabel);
   }
 
   /**
@@ -170,6 +183,9 @@ export function createMeasurementRuntime(): MeasurementRuntime {
       status === "granted" && !storedSourceDistrusted
         ? readStoredSource(now(), grantIdentity())
         : null;
+    // This is the read that snapshots are made from. A record this document
+    // did not mint still occupies its ordinal.
+    if (record) ledger.advancePast(record.arrival);
     syncCampaign(record);
     return record;
   }
@@ -267,7 +283,8 @@ export function createMeasurementRuntime(): MeasurementRuntime {
         ? readStoredSource(now(), grantIdentity())
         : null;
     appliedSourceArrival = record ? record.arrival : 0;
-    adapter.start({ routeLabel: activeRouteLabel(), source: record ? APPROVED_TUPLE : null });
+    appliedRouteLabel = activeRouteLabel();
+    adapter.start({ routeLabel: appliedRouteLabel, source: record ? APPROVED_TUPLE : null });
   }
 
   function countCurrentPageOnce(): void {
@@ -285,6 +302,7 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     invalidateStoredSource();
     clearSourceTimer();
     appliedSourceArrival = 0;
+    appliedRouteLabel = null;
     lastCountedPathname = null;
     // `emittedSuccessOperations` is deliberately *not* cleared. An operation
     // that was resolved while consent was gone stays resolved, so a later
@@ -556,10 +574,12 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     if (status === "granted") {
       scheduleExpiryCheck(readConsent(now()).expiresAt);
       startAdapter();
-      // A restored same-tab record keeps whatever idle window it had left.
-      armSourceDeadline(
-        storedSourceDistrusted ? null : readStoredSource(now(), grantIdentity()),
-      );
+      // A restored same-tab record keeps whatever idle window it had left, and
+      // the ordinal an earlier document gave it: the next arrival here must not
+      // be handed the same one.
+      const restored = storedSourceDistrusted ? null : readStoredSource(now(), grantIdentity());
+      if (restored) ledger.advancePast(restored.arrival);
+      armSourceDeadline(restored);
     }
     subscribeToOtherDocuments(onOtherDocumentChange);
     subscribeToLifecycle();

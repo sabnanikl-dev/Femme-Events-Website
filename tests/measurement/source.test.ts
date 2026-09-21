@@ -313,3 +313,101 @@ test("unrelated query fields are ignored, never persisted and never transmitted"
     h.teardown();
   }
 });
+
+/* ── Oversized queries are classified by their keys (finding A-R2) ─────────── */
+
+const FILLER = "x".repeat(2050);
+
+/** Oversized queries whose only campaign-looking text sits inside a value. */
+const OVERSIZED_UNRELATED_VALUES = [
+  "?note=" + FILLER + "utm_source",
+  "?note=" + FILLER + "UTM_Campaign",
+  "?note=" + FILLER + "gclid",
+  "?note=" + FILLER + "a_glow",
+  "?note=" + FILLER + "epikurean",
+  "?note=" + FILLER + "%75tm_source",
+  "?note=" + FILLER + "%67clid",
+  "?note=utm_source%3Dgoogle" + FILLER,
+  "?service=the-full-femme&note=" + FILLER + "fbclid&ref=msclkid",
+];
+
+/** Oversized queries where a *key* is campaign input, wherever it sits. */
+const OVERSIZED_SOURCE_KEYS = [
+  "?note=" + FILLER + "&utm_source=google",
+  "?utm_term=wedding&note=" + FILLER,
+  "?note=" + FILLER + "&gclid=abc123",
+  "?note=" + FILLER + "&_gl=1",
+  "?note=" + FILLER + "&GCLID=abc123",
+  "?note=" + FILLER + "&%75tm_source=google",
+  "?note=" + FILLER + "&%67clid=abc123",
+  "?note=" + FILLER + "&%75tm_" + "y".repeat(200) + "=1",
+  "?note=" + FILLER + "&utm_source",
+  "?note=" + FILLER + "&%zz=1",
+  GBP + "&note=" + FILLER,
+];
+
+test("campaign-looking text inside an oversized unrelated value is not campaign input", () => {
+  for (const search of OVERSIZED_UNRELATED_VALUES) {
+    assert.ok(search.length > 2048, "oversized: " + search.slice(0, 40));
+    assert.equal(classifySearch(search), "none", search.slice(0, 40) + "…" + search.slice(-16));
+  }
+  // The same text is not campaign input in a query of ordinary length either,
+  // so oversized input is no stricter about values than the normal path.
+  assert.equal(classifySearch("?note=utm_source"), "none");
+  assert.equal(classifySearch("?note=gclid&xutm_source=1"), "none");
+  assert.equal(classifySearch("?xutm_source=1&note=" + FILLER), "none");
+});
+
+test("an oversized query with a campaign key anywhere is still unsupported", () => {
+  for (const search of OVERSIZED_SOURCE_KEYS) {
+    assert.ok(search.length > 2048, "oversized: " + search.slice(0, 40));
+    assert.equal(classifySearch(search), "unsupported", search.slice(0, 24) + "…" + search.slice(-24));
+  }
+});
+
+test("an oversized unrelated value keeps valid attribution and purges nothing", () => {
+  for (const action of ["PUSH", "POP"] as const) {
+    for (const search of OVERSIZED_UNRELATED_VALUES) {
+      const h = setupHarness({ search: GBP });
+      try {
+        h.runtime.grant();
+        const before = h.runtime.snapshotSource();
+        assert.notEqual(before, null);
+        const configsBefore = h.tag.configs.length;
+
+        h.runtime.recordNavigation("/", search, action);
+        assert.deepEqual(h.runtime.snapshotSource(), before, action + " " + search.slice(-16));
+        assert.equal((storedSource(h) as Record<string, unknown>).c, "gbp");
+        assert.equal(h.tag.configs.length, configsBefore, "no purge, and nothing else, was configured");
+        assert.equal(h.tag.configState().campaign_name, "gbp");
+
+        h.runtime.trackEvent("phone_click", { location: "footer" });
+        const event = h.tag.collected.at(-1);
+        assert.equal(event?.params.campaign, "gbp");
+        // The unrelated value itself goes nowhere.
+        const serialised = JSON.stringify([[...h.env.session.raw.entries()], h.tag.collected, h.tag.configs]);
+        assert.equal(serialised.includes("xxxxxxxx"), false);
+      } finally {
+        h.teardown();
+      }
+    }
+  }
+});
+
+test("an oversized query with a campaign key still clears prior GBP state", () => {
+  for (const action of ["PUSH", "POP"] as const) {
+    for (const search of OVERSIZED_SOURCE_KEYS) {
+      const h = setupHarness({ search: GBP });
+      try {
+        h.runtime.grant();
+        assert.notEqual(h.runtime.snapshotSource(), null);
+        h.runtime.recordNavigation("/", search, action);
+        assert.equal(h.runtime.snapshotSource(), null, action + " " + search.slice(-24));
+        assert.equal(storedSource(h), null);
+        assert.equal(h.tag.configs.at(-1)?.params.campaign_name, "", "provider campaign is purged");
+      } finally {
+        h.teardown();
+      }
+    }
+  }
+});

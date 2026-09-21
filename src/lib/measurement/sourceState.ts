@@ -20,14 +20,24 @@
  * state stays volatile. Nothing is written to session storage now until an
  * explicit grant, and a refusal writes nothing at all.
  *
- * Dropping the persisted ledger loses nothing, because the guarantee it was
- * there for is carried by two other things that survive a document boundary:
+ * The guarantee the persisted ledger was there for — a revoked landing never
+ * comes back — is carried by two other things that survive a document boundary:
  *
  * - a reload or a history traversal is not an arrival at all
  *   (`documentNavigationType()`), so a revoked landing is never re-read from
  *   the URL in the first place; and
  * - a stored record names the grant it belongs to (`consentEpoch`), so a
  *   record that outlived its grant cannot be adopted by the next one.
+ *
+ * What a per-document ledger does lose is continuity of the ordinal, and the
+ * ordinal has a second job: it is how an in-flight inquiry tells the
+ * attribution it was formed with from one that replaced it. A granted record
+ * restored after a reload still carries the ordinal an earlier document gave
+ * it, and a ledger starting from zero would hand that same number to the next
+ * arrival. So the ledger is advanced past the ordinal of any stored record
+ * this document reads (`advancePast`). That stays in memory too: only a record
+ * that an explicit grant already allowed to be written is ever read, and
+ * nothing new is written down.
  *
  * ## Which grant a stored record belongs to
  *
@@ -77,8 +87,9 @@ export const APPROVED_TUPLE: SourceTuple = {
 
 /**
  * Arrival bookkeeping for one document. Two counters and nothing else: `seq`
- * is how many source-bearing arrivals this document has seen, `consumed` is the
- * highest one already resolved by being promoted, refused or revoked.
+ * is the highest arrival ordinal taken so far — minted by this document, or
+ * carried by a stored record it read — and `consumed` is the highest one
+ * already resolved by being promoted, refused or revoked.
  *
  * It is created per runtime and never written anywhere, so a tagged landing
  * leaves no trace before the visitor chooses and none after a refusal.
@@ -90,6 +101,11 @@ export type ArrivalLedger = {
   consume: (arrival: number) => void;
   /** Burns every arrival this document currently knows about. */
   consumeAll: () => void;
+  /**
+   * Accounts for a stored record this document did not mint: its ordinal is
+   * taken and already resolved, so `register` never hands it out again.
+   */
+  advancePast: (arrival: number) => void;
   isEligible: (arrival: number) => boolean;
 };
 
@@ -107,6 +123,10 @@ export function createArrivalLedger(): ArrivalLedger {
     },
     consumeAll: () => {
       consumed = seq;
+    },
+    advancePast: (arrival) => {
+      seq = Math.max(seq, arrival);
+      consumed = Math.max(consumed, arrival);
     },
     isEligible: (arrival) => arrival > consumed && arrival <= seq,
   };

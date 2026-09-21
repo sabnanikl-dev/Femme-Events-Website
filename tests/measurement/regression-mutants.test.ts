@@ -23,8 +23,12 @@ import { CONSENT_TTL_MS, SOURCE_STORAGE_KEY } from "../../src/lib/measurement/po
 import { classifySearch } from "../../src/lib/measurement/sourceInput.ts";
 import type { SourceClassification } from "../../src/lib/measurement/sourceInput.ts";
 import { validateEvent } from "../../src/lib/measurement/schema.ts";
-import { readStoredSource, writeStoredSource } from "../../src/lib/measurement/sourceState.ts";
-import type { SourceRecord } from "../../src/lib/measurement/sourceState.ts";
+import {
+  createArrivalLedger,
+  readStoredSource,
+  writeStoredSource,
+} from "../../src/lib/measurement/sourceState.ts";
+import type { ArrivalLedger, SourceRecord } from "../../src/lib/measurement/sourceState.ts";
 import { installFakeEnvironment } from "./harness/fakeEnvironment.ts";
 import { installFakeTag } from "./harness/fakeTag.ts";
 import { FIXTURE_MEASUREMENT_ID, setupHarness } from "./harness/setup.ts";
@@ -740,5 +744,134 @@ test("an event-scoped campaign clear works in the current adapter", () => {
 test("the same check fails against an adapter with no event-scoped campaign", () => {
   assertFails("inherited page campaign", () =>
     assertSuccessDoesNotInheritPageCampaign(adapterWithoutEventCampaignScope),
+  );
+});
+
+/* ── 10. A restored ordinal is never minted again ──────────────────────────── */
+
+/** Mutant: the pre-repair ledger, which started from zero in every document
+ *  and was never told about the record a reload restored. */
+function ledgerUnawareOfRestoredRecords(): ArrivalLedger {
+  return { ...createArrivalLedger(), advancePast: () => {} };
+}
+
+function assertRestoredOrdinalIsNotReissued(makeLedger: () => ArrivalLedger): void {
+  const ledger = makeLedger();
+  // A reload restored a granted record that an earlier document numbered 1.
+  ledger.advancePast(1);
+  assert.equal(ledger.isEligible(1), false, "a restored record is already resolved");
+  const next = ledger.register();
+  assert.notEqual(next, 1, "the next arrival was handed the restored ordinal");
+  assert.equal(ledger.isEligible(next), true, "and it is still a live arrival of its own");
+
+  // A record this document minted itself moves nothing.
+  ledger.advancePast(next);
+  assert.equal(ledger.register(), next + 1);
+}
+
+test("the current ledger never reissues a restored ordinal", () => {
+  assertRestoredOrdinalIsNotReissued(createArrivalLedger);
+});
+
+test("the same check fails against a ledger that starts from zero regardless", () => {
+  assertFails("ledger unaware of restored records", () =>
+    assertRestoredOrdinalIsNotReissued(ledgerUnawareOfRestoredRecords),
+  );
+});
+
+/* ── 11. Oversized queries are classified by key, not by value text ────────── */
+
+/** Mutant: the pre-repair backstop, which scanned the whole oversized query -
+ *  unrelated values included - for campaign-looking substrings. */
+function valueScanningClassifySearch(search: string): SourceClassification {
+  const verdict = classifySearch(search);
+  if (verdict !== "none" || search.length <= 2048) return verdict;
+  const lower = search.toLowerCase();
+  return ["utm_", "gclid", "fbclid", "_gl"].some((text) => lower.includes(text)) ? "unsupported" : "none";
+}
+
+function assertOversizedValuesAreNotCampaignInput(
+  classify: (search: string) => SourceClassification,
+): void {
+  const filler = "x".repeat(2050);
+  assert.equal(classify("?note=" + filler + "utm_source"), "none");
+  assert.equal(classify("?note=" + filler + "gclid"), "none");
+  assert.equal(classify("?note=" + filler + "a_glow"), "none");
+  // The guard the backstop was there for is kept: keys still fail closed.
+  assert.equal(classify("?note=" + filler + "&utm_source=google"), "unsupported");
+  assert.equal(classify("?note=" + filler + "&%75tm_source=google"), "unsupported");
+  assert.equal(classify("?note=" + filler + "&%67clid=abc"), "unsupported");
+}
+
+test("oversized unrelated values are not campaign input in the current classifier", () => {
+  assertOversizedValuesAreNotCampaignInput(classifySearch);
+});
+
+test("the same check fails against a classifier that scans values", () => {
+  assertFails("value-scanning oversized backstop", () =>
+    assertOversizedValuesAreNotCampaignInput(valueScanningClassifySearch),
+  );
+});
+
+/* ── 12. Provider route context is refreshed without a campaign change ─────── */
+
+/** Mutant: the pre-repair adapter, which re-configured only when there was a
+ *  campaign to set or purge, so a plain route change configured nothing. */
+function adapterWithoutRouteRefresh(options: Ga4AdapterOptions): Ga4Adapter {
+  const real = createGa4Adapter(options);
+  let campaignApplied = false;
+  return {
+    ...real,
+    start: (context) => {
+      campaignApplied = context.source !== null;
+      real.start(context);
+    },
+    setCampaign: (source, routeLabel) => {
+      if (source === null && !campaignApplied) return;
+      campaignApplied = source !== null;
+      real.setCampaign(source, routeLabel);
+    },
+  };
+}
+
+function assertLifecycleTrafficInheritsCurrentRoute(
+  make: (options: Ga4AdapterOptions) => Ga4Adapter,
+): void {
+  const env = installFakeEnvironment();
+  const tag = installFakeTag();
+  try {
+    const adapter = make({
+      measurementId: FIXTURE_MEASUREMENT_ID,
+      loader: (request) => {
+        const installer = (globalThis as Record<string, unknown>)
+          .__FEMME_MEASUREMENT_FIXTURE_TAG__ as (r: typeof request) => void;
+        installer(request);
+        return { remove: () => {} };
+      },
+      now: () => env.now(),
+      isPermitted: () => true,
+    });
+    adapter.start({ routeLabel: "/", source: null });
+    // The visitor moves to another route with no campaign held or purged.
+    adapter.setCampaign(null, "/about");
+    // Provider-originated traffic that never passes through the wrapper.
+    tag.lifecycleTick();
+    const lifecycle = tag.collected.at(-1);
+    assert.equal(lifecycle?.effective.page_location, "https://femmeevents.com/about");
+    assert.equal("campaign_name" in (lifecycle?.effective ?? {}), false, "no campaign was invented");
+    assert.equal(tag.configs.at(-1)?.params.send_page_view, false);
+  } finally {
+    tag.uninstall();
+    env.restore();
+  }
+}
+
+test("lifecycle traffic inherits the current route in the current adapter", () => {
+  assertLifecycleTrafficInheritsCurrentRoute(createGa4Adapter);
+});
+
+test("the same check fails against an adapter that only re-configures campaigns", () => {
+  assertFails("no route-context refresh", () =>
+    assertLifecycleTrafficInheritsCurrentRoute(adapterWithoutRouteRefresh),
   );
 });

@@ -8,7 +8,8 @@ import assert from "node:assert/strict";
 
 import { createInquirySubmitter } from "../../src/lib/measurement/inquirySubmit.ts";
 import { SOURCE_IDLE_TTL_MS } from "../../src/lib/measurement/policy.ts";
-import { collectedNames, safeContext, setupHarness } from "./harness/setup.ts";
+import { collectedNames, safeContext, setupHarness, storedSource } from "./harness/setup.ts";
+import type { Harness } from "./harness/setup.ts";
 
 const GBP = "?utm_source=google&utm_medium=organic&utm_campaign=gbp";
 const ENDPOINT = "https://formspree.invalid/f/local-inert-fixture";
@@ -431,6 +432,148 @@ test("a success withdrawn mid-request is not replayed by a later re-grant", () =
       1,
       "a new operation after re-granting still counts once",
     );
+  } finally {
+    h.teardown();
+  }
+});
+
+/* ── Attribution instances across a same-tab reload (finding A-R1) ─────────── */
+
+/**
+ * A granted GBP visitor reloads the tab: consent and the stored source record
+ * carry over, the URL is not re-read, and the new document starts with a fresh
+ * in-memory arrival ledger.
+ */
+function reloadedWithRestoredSource(): Harness {
+  const first = setupHarness({ search: GBP });
+  let carriedSession: Map<string, string>;
+  let carriedLocal: Map<string, string>;
+  try {
+    first.runtime.grant();
+    assert.equal((storedSource(first) as Record<string, unknown>).n, 1);
+    carriedSession = new Map(first.env.session.raw);
+    carriedLocal = new Map(first.env.local.raw);
+  } finally {
+    first.teardown();
+  }
+  const reloaded = setupHarness({ search: GBP, navigationType: "reload", init: false });
+  for (const [key, value] of carriedSession) reloaded.env.session.raw.set(key, value);
+  for (const [key, value] of carriedLocal) reloaded.env.local.raw.set(key, value);
+  reloaded.runtime.init();
+  return reloaded;
+}
+
+test("an arrival after a reload is a different attribution instance from the restored one", () => {
+  const h = reloadedWithRestoredSource();
+  try {
+    const snapshot = h.runtime.snapshotSource();
+    assert.equal(snapshot?.arrival, 1, "the restored record keeps the ordinal it was written with");
+
+    // Mid-request, a second later, a genuine tagged navigation replaces the
+    // attribution. This document's ledger has never minted anything, so without
+    // knowing about the restored ordinal it would mint the same one again.
+    h.env.advance(1_000);
+    h.runtime.recordNavigation("/about", GBP, "PUSH");
+    const replacement = h.runtime.snapshotSource();
+    assert.notEqual(replacement, null);
+    assert.notEqual(replacement?.arrival, snapshot?.arrival, "two instances, two ordinals");
+    assert.equal((storedSource(h) as Record<string, unknown>).n, 2, "minted past the restored ordinal");
+
+    h.runtime.trackInquirySuccess("inquiry-1", "in-your-corner", snapshot);
+    const success = h.tag.collected.find((entry) => entry.name === "inquiry_submit");
+    assert.deepEqual(success?.params, {
+      location: "inquiry_form",
+      service: "in-your-corner",
+      campaign_source: "",
+      campaign_medium: "",
+      campaign_name: "",
+      ...safeContext("/about"),
+    });
+    assert.equal(success?.effective.campaign_name, "");
+
+    // The page really was reached through GBP again, and ordinary events say so.
+    h.runtime.trackEvent("phone_click", { location: "footer" });
+    const nextEvent = h.tag.collected.at(-1);
+    assert.equal(nextEvent?.name, "phone_click");
+    assert.equal(nextEvent?.params.campaign, "gbp");
+    assert.equal(nextEvent?.effective.campaign_name, "gbp");
+  } finally {
+    h.teardown();
+  }
+});
+
+test("a restored source still labels a submission when nothing replaced it", () => {
+  const h = reloadedWithRestoredSource();
+  try {
+    const snapshot = h.runtime.snapshotSource();
+    h.env.advance(1_000);
+    // Ordinary navigation is not an arrival and must not look like one.
+    h.runtime.recordNavigation("/about", "", "PUSH");
+    h.runtime.trackInquirySuccess("inquiry-1", "in-your-corner", snapshot);
+    const success = h.tag.collected.find((entry) => entry.name === "inquiry_submit");
+    assert.deepEqual(success?.params, {
+      location: "inquiry_form",
+      service: "in-your-corner",
+      source: "google",
+      medium: "organic",
+      campaign: "gbp",
+      ...safeContext("/about"),
+    });
+    assert.equal(success?.effective.campaign_name, "gbp");
+    assert.equal((storedSource(h) as Record<string, unknown>).n, 1, "restoration mints nothing");
+  } finally {
+    h.teardown();
+  }
+});
+
+test("a restored source that idles out before a new arrival is not revived by it", () => {
+  const h = reloadedWithRestoredSource();
+  try {
+    const snapshot = h.runtime.snapshotSource();
+    // The restored attribution expires, and only then does a new arrival land.
+    h.env.advance(SOURCE_IDLE_TTL_MS);
+    h.runtime.recordNavigation("/about", GBP, "PUSH");
+    assert.notEqual(h.runtime.snapshotSource()?.arrival, snapshot?.arrival);
+    h.runtime.trackInquirySuccess("inquiry-1", "in-your-corner", snapshot);
+    const success = h.tag.collected.find((entry) => entry.name === "inquiry_submit");
+    assert.equal(success?.params.campaign, undefined);
+    assert.equal(success?.effective.campaign_name, "");
+  } finally {
+    h.teardown();
+  }
+});
+
+test("the ledger is seeded from the restored record before anything reads it", () => {
+  const h = reloadedWithRestoredSource();
+  try {
+    // No snapshot, event or navigation has touched the restored record yet:
+    // the very first thing this document does is take a new tagged arrival.
+    h.runtime.recordNavigation("/about", GBP, "PUSH");
+    assert.equal((storedSource(h) as Record<string, unknown>).n, 2, "not the restored ordinal again");
+    assert.equal(h.runtime.snapshotSource()?.arrival, 2);
+  } finally {
+    h.teardown();
+  }
+});
+
+test("a record written by a later document in the same tab keeps its own ordinal too", () => {
+  const h = setupHarness({ search: GBP });
+  try {
+    h.runtime.grant();
+    // This document minted arrival 1. It is then restored from the back/forward
+    // cache after a later document in the same tab stored arrival 2 under the
+    // same grant, so the record it reads is one it never minted.
+    const record = storedSource(h) as Record<string, unknown>;
+    h.env.session.raw.set("femme.analytics.source.v1", JSON.stringify({ ...record, n: 2 }));
+    const snapshot = h.runtime.snapshotSource();
+    assert.equal(snapshot?.arrival, 2);
+
+    h.runtime.recordNavigation("/about", GBP, "PUSH");
+    assert.notEqual(h.runtime.snapshotSource()?.arrival, snapshot?.arrival);
+    h.runtime.trackInquirySuccess("inquiry-1", "in-your-corner", snapshot);
+    const success = h.tag.collected.find((entry) => entry.name === "inquiry_submit");
+    assert.equal(success?.params.campaign, undefined);
+    assert.equal(success?.effective.campaign_name, "");
   } finally {
     h.teardown();
   }

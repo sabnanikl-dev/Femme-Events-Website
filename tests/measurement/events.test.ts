@@ -5,6 +5,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import { SOURCE_IDLE_TTL_MS } from "../../src/lib/measurement/policy.ts";
 import { validateEvent } from "../../src/lib/measurement/schema.ts";
 import { routeLabelFor } from "../../src/lib/measurement/routes.ts";
 import { SERVICE_OPTIONS } from "../../src/data/serviceOptions.ts";
@@ -304,6 +305,156 @@ test("raw context handed to the adapter cannot override the safe context", () =>
     const serialised = JSON.stringify(h.tag.collected);
     assert.equal(serialised.includes("bride@example.com"), false);
     assert.equal(serialised.includes("google.com/search"), false);
+  } finally {
+    h.teardown();
+  }
+});
+
+/* ── Provider route context follows navigation (finding B-CTX-01) ──────────── */
+
+/** `page_location` of every `config` the modelled tag has processed, in order. */
+function configuredLocations(h: ReturnType<typeof setupHarness>): unknown[] {
+  return h.tag.configs.map((config) => config.params.page_location);
+}
+
+test("untagged navigation refreshes the provider route context without a campaign", () => {
+  const h = setupHarness();
+  try {
+    h.runtime.recordNavigation("/", "", "PUSH");
+    h.runtime.grant();
+    assert.deepEqual(configuredLocations(h), ["https://femmeevents.com/"]);
+
+    h.runtime.recordNavigation("/about", "", "PUSH");
+    assert.deepEqual(configuredLocations(h), [
+      "https://femmeevents.com/",
+      "https://femmeevents.com/about",
+    ]);
+    // The refresh is context only: it cannot re-enable the automatic pageview,
+    // and with no campaign held it neither sets nor clears one.
+    assert.deepEqual(h.tag.configs.at(-1)?.params, { send_page_view: false, ...safeContext("/about") });
+
+    // Provider-originated traffic never passes through the wrapper, so the
+    // config scope is the only route context it has.
+    h.tag.lifecycleTick();
+    const lifecycle = h.tag.collected.at(-1);
+    assert.equal(lifecycle?.name, "user_engagement");
+    assert.equal(lifecycle?.effective.page_location, "https://femmeevents.com/about");
+    assert.equal(lifecycle?.effective.page_title, "Femme Events");
+    assert.equal(lifecycle?.effective.page_referrer, "");
+    assert.equal("campaign_name" in (lifecycle?.effective ?? {}), false);
+
+    // Exactly one pageview per route, and the config is set before it.
+    assert.deepEqual(collectedNames(h), ["page_view", "page_view", "user_engagement"]);
+  } finally {
+    h.teardown();
+  }
+});
+
+test("GBP-attributed navigation refreshes the route context and keeps the campaign", () => {
+  const h = setupHarness({ search: GBP });
+  try {
+    h.runtime.recordNavigation("/", GBP, "PUSH");
+    h.runtime.grant();
+    h.runtime.recordNavigation("/about", "", "PUSH");
+
+    assert.deepEqual(configuredLocations(h), [
+      "https://femmeevents.com/",
+      "https://femmeevents.com/about",
+    ]);
+    assert.deepEqual(h.tag.configs.at(-1)?.params, {
+      send_page_view: false,
+      ...safeContext("/about"),
+      campaign_source: "google",
+      campaign_medium: "organic",
+      campaign_name: "gbp",
+    });
+
+    h.tag.lifecycleTick();
+    const lifecycle = h.tag.collected.at(-1);
+    assert.equal(lifecycle?.effective.page_location, "https://femmeevents.com/about");
+    assert.equal(lifecycle?.effective.campaign_source, "google");
+    assert.equal(lifecycle?.effective.campaign_medium, "organic");
+    assert.equal(lifecycle?.effective.campaign_name, "gbp");
+    assert.equal(collectedNames(h).filter((n) => n === "page_view").length, 2);
+    assert.equal(h.runtime.snapshotSource()?.arrival, 1, "a route change is not an arrival");
+  } finally {
+    h.teardown();
+  }
+});
+
+test("only a change of route category reconfigures the provider", () => {
+  const h = setupHarness({ pathname: "/journal/first-post" });
+  try {
+    h.runtime.recordNavigation("/journal/first-post", "", "PUSH");
+    h.runtime.grant();
+    assert.equal(h.tag.configs.length, 1);
+
+    // A StrictMode repeat, a query-only change, an event and another post in
+    // the same category all leave the configured context as it is.
+    h.runtime.recordNavigation("/journal/first-post", "", "PUSH");
+    h.runtime.recordNavigation("/journal/first-post", "?service=in-your-corner", "PUSH");
+    h.runtime.trackEvent("phone_click", { location: "footer" });
+    h.runtime.recordNavigation("/journal/second-post", "", "PUSH");
+    assert.equal(h.tag.configs.length, 1);
+
+    // History traversal to another category is a navigation like any other.
+    h.runtime.recordNavigation("/", "", "POP");
+    h.runtime.recordNavigation("/", "", "POP");
+    assert.deepEqual(configuredLocations(h), [
+      "https://femmeevents.com/journal/post",
+      "https://femmeevents.com/",
+    ]);
+    h.tag.lifecycleTick();
+    assert.equal(h.tag.collected.at(-1)?.effective.page_location, "https://femmeevents.com/");
+    const serialised = JSON.stringify([h.tag.configs, h.tag.collected]);
+    assert.equal(serialised.includes("first-post"), false, "never the slug");
+    assert.equal(serialised.includes("second-post"), false, "never the slug");
+  } finally {
+    h.teardown();
+  }
+});
+
+test("a route refresh neither skips nor repeats a campaign purge", () => {
+  const h = setupHarness({ search: GBP, fakeTimers: true });
+  try {
+    h.runtime.recordNavigation("/", GBP, "PUSH");
+    h.runtime.grant();
+    // The source idles out on `/`, which purges the provider campaign there.
+    h.env.advance(SOURCE_IDLE_TTL_MS);
+    assert.equal(h.tag.configs.at(-1)?.params.campaign_name, "");
+    assert.equal(h.tag.configs.at(-1)?.params.page_location, "https://femmeevents.com/");
+    const afterPurge = h.tag.configs.length;
+
+    h.runtime.recordNavigation("/about", "", "PUSH");
+    assert.equal(h.tag.configs.length, afterPurge + 1);
+    assert.deepEqual(h.tag.configs.at(-1)?.params, { send_page_view: false, ...safeContext("/about") });
+    h.tag.lifecycleTick();
+    const lifecycle = h.tag.collected.at(-1);
+    assert.equal(lifecycle?.effective.page_location, "https://femmeevents.com/about");
+    assert.equal(lifecycle?.effective.campaign_name, "", "the purge still stands");
+  } finally {
+    h.teardown();
+  }
+});
+
+test("a refused, undecided or withdrawn visitor's navigation configures nothing", () => {
+  const h = setupHarness();
+  try {
+    h.runtime.recordNavigation("/", "", "PUSH");
+    h.runtime.recordNavigation("/about", "", "PUSH");
+    assert.equal(h.tag.configs.length, 0, "undecided");
+    h.runtime.grant();
+    // A grant configures the route the visitor is on now, not the landing one.
+    assert.deepEqual(configuredLocations(h), ["https://femmeevents.com/about"]);
+    h.runtime.withdraw();
+    const afterWithdrawal = h.tag.configs.length;
+    h.runtime.recordNavigation("/journal", "", "PUSH");
+    assert.equal(h.tag.configs.length, afterWithdrawal, "withdrawn");
+    // Re-granting starts from the current route, with no stale sync state.
+    h.runtime.grant();
+    assert.equal(h.tag.configs.at(-1)?.params.page_location, "https://femmeevents.com/journal");
+    h.runtime.recordNavigation("/about", "", "PUSH");
+    assert.equal(h.tag.configs.at(-1)?.params.page_location, "https://femmeevents.com/about");
   } finally {
     h.teardown();
   }
