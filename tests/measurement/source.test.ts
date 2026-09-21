@@ -79,6 +79,8 @@ test("an undecided arrival is held only in memory", () => {
       medium: "organic",
       campaign: "gbp",
       arrival: 1,
+      // The instant the arrival was captured, not the instant of the grant.
+      capturedAt: h.env.now(),
     });
     const record = storedSource(h) as Record<string, unknown>;
     assert.equal(record.s, "google");

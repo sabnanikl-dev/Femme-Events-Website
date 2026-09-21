@@ -8,6 +8,8 @@ import assert from "node:assert/strict";
 
 import { createInquirySubmitter } from "../../src/lib/measurement/inquirySubmit.ts";
 import { SOURCE_IDLE_TTL_MS } from "../../src/lib/measurement/policy.ts";
+import { createMeasurementRuntime } from "../../src/lib/measurement/runtime.ts";
+import type { MeasurementRuntime } from "../../src/lib/measurement/runtime.ts";
 import { collectedNames, safeContext, setupHarness, storedSource } from "./harness/setup.ts";
 import type { Harness } from "./harness/setup.ts";
 
@@ -574,6 +576,173 @@ test("a record written by a later document in the same tab keeps its own ordinal
     const success = h.tag.collected.find((entry) => entry.name === "inquiry_submit");
     assert.equal(success?.params.campaign, undefined);
     assert.equal(success?.effective.campaign_name, "");
+  } finally {
+    h.teardown();
+  }
+});
+
+/* ── Attribution instances across same-tab documents (finding A-R1) ────────── */
+
+/**
+ * A full forward navigation in the same tab. The earlier document goes into the
+ * back/forward cache with its runtime, ledger and any in-flight inquiry intact;
+ * the new document shares its consent and session storage and starts a runtime
+ * and a ledger of its own.
+ */
+function openForwardDocument(h: Harness, pathname: string, search: string): MeasurementRuntime {
+  h.env.emitLifecycleEvent("pagehide");
+  h.env.advance(60_000);
+  h.env.setLocation({ pathname, search });
+  h.env.setNavigationType("navigate");
+  const next = createMeasurementRuntime();
+  next.init();
+  return next;
+}
+
+/**
+ * Back, restoring the earlier document from the cache. The later document's
+ * listeners go quiet with it. `announce: false` leaves out the `pageshow`
+ * checkpoint, because nothing may depend on a lifecycle event having been
+ * delivered before the restored document does something.
+ */
+function restoreEarlierDocument(
+  h: Harness,
+  later: MeasurementRuntime,
+  pathname: string,
+  search: string,
+  options: { announce?: boolean } = {},
+): void {
+  later.destroy();
+  h.env.advance(1_000);
+  h.env.setLocation({ pathname, search });
+  if (options.announce !== false) h.env.emitLifecycleEvent("pageshow");
+}
+
+function successEvents(h: Harness) {
+  return h.tag.collected.filter((entry) => entry.name === "inquiry_submit");
+}
+
+test("a tagged forward document does not reissue the ordinal an in-flight inquiry holds", () => {
+  const h = setupHarness({ search: GBP });
+  try {
+    h.runtime.grant();
+    const snapshot = h.runtime.snapshotSource();
+    assert.equal(snapshot?.arrival, 1);
+
+    // The request is out. The visitor follows another GBP link: a whole new
+    // document, whose ledger has minted nothing and would start again at one.
+    const forward = openForwardDocument(h, "/", GBP);
+    const replacement = forward.snapshotSource();
+    assert.notEqual(replacement, null);
+    assert.notEqual(replacement?.arrival, snapshot?.arrival, "two instances, two ordinals");
+    assert.notEqual(replacement?.capturedAt, snapshot?.capturedAt);
+    assert.equal((storedSource(h) as Record<string, unknown>).n, 2, "minted past the carried ordinal");
+
+    // Back. The original operation is accepted in the restored document.
+    restoreEarlierDocument(h, forward, "/", GBP);
+    h.runtime.trackInquirySuccess("inquiry-1-1", "in-your-corner", snapshot);
+    assert.equal(successEvents(h).length, 1);
+    const success = successEvents(h)[0];
+    assert.deepEqual(success.params, {
+      location: "inquiry_form",
+      service: "in-your-corner",
+      campaign_source: "",
+      campaign_medium: "",
+      campaign_name: "",
+      ...safeContext("/"),
+    });
+    assert.equal(success.effective.campaign_name, "", "config inheritance cannot relabel it either");
+
+    // The replacement arrival is untouched by the old operation settling.
+    const stored = storedSource(h) as Record<string, unknown>;
+    assert.equal(stored.n, replacement?.arrival);
+    assert.equal(stored.t, replacement?.capturedAt);
+    h.runtime.trackEvent("phone_click", { location: "footer" });
+    assert.equal(h.tag.collected.at(-1)?.params.campaign, "gbp");
+    assert.equal(h.tag.collected.at(-1)?.effective.campaign_name, "gbp");
+  } finally {
+    h.teardown();
+  }
+});
+
+test("an untagged forward document leaves the original attribution with its inquiry", () => {
+  const h = setupHarness({ search: GBP });
+  try {
+    h.runtime.grant();
+    const snapshot = h.runtime.snapshotSource();
+    const forward = openForwardDocument(h, "/about", "");
+    assert.deepEqual(forward.snapshotSource(), snapshot, "the same instance, read by another document");
+
+    restoreEarlierDocument(h, forward, "/", GBP);
+    h.runtime.trackInquirySuccess("inquiry-1-1", "in-your-corner", snapshot);
+    assert.equal(successEvents(h).length, 1);
+    assert.deepEqual(successEvents(h)[0].params, {
+      location: "inquiry_form",
+      service: "in-your-corner",
+      source: "google",
+      medium: "organic",
+      campaign: "gbp",
+      ...safeContext("/"),
+    });
+    assert.equal(successEvents(h)[0].effective.campaign_name, "gbp");
+    assert.equal((storedSource(h) as Record<string, unknown>).n, 1, "reading a record mints nothing");
+  } finally {
+    h.teardown();
+  }
+});
+
+test("a restored document mints past arrivals a later document took while it was cached", () => {
+  const h = setupHarness({ search: GBP });
+  try {
+    h.runtime.grant();
+    // The later document arrives untagged, then takes a tagged in-app arrival
+    // and forms an inquiry of its own with it.
+    const forward = openForwardDocument(h, "/about", "");
+    forward.recordNavigation("/", GBP, "PUSH");
+    const laterSnapshot = forward.snapshotSource();
+    assert.equal(laterSnapshot?.arrival, 2);
+
+    // Back, and the very first thing the restored document does is take a
+    // tagged arrival. Its own ledger last saw ordinal 1, and no lifecycle
+    // checkpoint has run to tell it otherwise.
+    restoreEarlierDocument(h, forward, "/", GBP, { announce: false });
+    h.runtime.recordNavigation("/about", GBP, "PUSH");
+    assert.equal((storedSource(h) as Record<string, unknown>).n, 3, "not the later document's ordinal");
+
+    // Forward again: the later document's inquiry settles against a record
+    // that replaced the one it was formed with.
+    h.env.setLocation({ pathname: "/", search: GBP });
+    forward.trackInquirySuccess("inquiry-1-1", "not-sure", laterSnapshot);
+    assert.equal(successEvents(h).length, 1);
+    assert.equal(successEvents(h)[0].params.campaign, undefined);
+    assert.equal(successEvents(h)[0].effective.campaign_name, "");
+  } finally {
+    h.teardown();
+  }
+});
+
+test("a reissued ordinal is still not the attribution the inquiry was formed with", () => {
+  const h = setupHarness({ search: GBP });
+  try {
+    h.runtime.grant();
+    const snapshot = h.runtime.snapshotSource();
+    assert.equal(snapshot?.arrival, 1);
+    // Mid-request the attribution is cleared outright, so the next document has
+    // no stored ordinal to continue from and nothing is kept that could tell it.
+    h.runtime.recordNavigation("/about", "?utm_source=newsletter", "PUSH");
+    assert.equal(storedSource(h), null);
+
+    const forward = openForwardDocument(h, "/", GBP);
+    const replacement = forward.snapshotSource();
+    assert.equal(replacement?.arrival, snapshot?.arrival, "ordinal continuity ends with the record");
+    assert.notEqual(replacement?.capturedAt, snapshot?.capturedAt);
+
+    restoreEarlierDocument(h, forward, "/about", "?utm_source=newsletter");
+    h.runtime.trackInquirySuccess("inquiry-1-1", "in-your-corner", snapshot);
+    assert.equal(successEvents(h).length, 1);
+    assert.equal(successEvents(h)[0].params.campaign, undefined, "an equal ordinal is not the same arrival");
+    assert.equal(successEvents(h)[0].effective.campaign_name, "");
+    assert.equal((storedSource(h) as Record<string, unknown>).t, replacement?.capturedAt);
   } finally {
     h.teardown();
   }

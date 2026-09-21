@@ -44,11 +44,18 @@ import { resolveTagLoader } from "./transport.ts";
 export type HistoryAction = "PUSH" | "REPLACE" | "POP";
 
 /**
- * What the inquiry request was formed with. `arrival` identifies the attribution
- * instance so a source that expires or is replaced mid-request can be detected
- * rather than mislabelled. It is a tab-scoped ordinal, not a visitor identifier.
+ * What the inquiry request was formed with. `arrival` and `capturedAt` together
+ * identify the attribution instance so a source that expires or is replaced
+ * mid-request can be detected rather than mislabelled. The ordinal is
+ * tab-scoped bookkeeping, not a visitor identifier, and it is only as unique as
+ * the ledgers that mint it: every document in the tab keeps its own, and one
+ * restored from the back/forward cache can hold a snapshot while a later
+ * document mints from a ledger that never saw it. The capture instant is a
+ * value the stored record already holds, it stays in memory with the snapshot
+ * and is never transmitted, and it is what still tells two instances apart
+ * when their ordinals cannot.
  */
-export type SourceSnapshot = SourceTuple & { arrival: number };
+export type SourceSnapshot = SourceTuple & { arrival: number; capturedAt: number };
 
 export type MeasurementRuntime = {
   init: () => void;
@@ -242,6 +249,15 @@ export function createMeasurementRuntime(): MeasurementRuntime {
 
   function captureArrival(): void {
     const stamp = now();
+    // Another document in this tab may have written a record since this ledger
+    // last looked: this one may be brand new, or may have sat in the
+    // back/forward cache while a later document took arrivals of its own. The
+    // stored ordinal is accounted for before a new one is minted, under the
+    // same conditions any other stored-source read has. Nothing is written.
+    if (status === "granted" && !storedSourceDistrusted) {
+      const stored = readStoredSource(stamp, grantIdentity());
+      if (stored) ledger.advancePast(stored.arrival);
+    }
     const arrival = ledger.register();
     const record: SourceRecord = {
       ...APPROVED_TUPLE,
@@ -688,7 +704,7 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     if (revalidateConsent() !== "granted") return null;
     const record = currentSource();
     if (!record) return null;
-    return { ...APPROVED_TUPLE, arrival: record.arrival };
+    return { ...APPROVED_TUPLE, arrival: record.arrival, capturedAt: record.capturedAt };
   }
 
   function trackInquirySuccess(
@@ -714,8 +730,14 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     if (status !== "granted" || !adapter?.isStarted()) return;
     const record = currentSource();
     // Source travels with the success event only when it is still the same,
-    // still-valid attribution the request was formed with.
-    const sameAttribution = Boolean(record && snapshot && record.arrival === snapshot.arrival);
+    // still-valid attribution the request was formed with. The ordinal alone
+    // cannot say that across documents, so the capture instant has to agree too.
+    const sameAttribution = Boolean(
+      record &&
+        snapshot &&
+        record.arrival === snapshot.arrival &&
+        record.capturedAt === snapshot.capturedAt,
+    );
     adapter.sendEvent(
       validated.name,
       sameAttribution ? { ...validated.params, ...APPROVED_TUPLE } : validated.params,
