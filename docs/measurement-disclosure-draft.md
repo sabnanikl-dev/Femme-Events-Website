@@ -42,9 +42,12 @@ browser that identify the browser session, not you by name. It is a Google
 product running on Google's servers, with the access to this page that any
 script on the page has.
 
-**How long.** Your choice is kept in this browser for six months. The record of
-how you arrived lasts 30 minutes of inactivity in this tab only. Google Analytics
-cookies are set to last for the browser session.
+**How long.** Your choice is kept in this browser for six months. Before you
+choose, nothing about how you arrived is stored at all; if you say no thanks,
+nothing is stored either. If you allow analytics, the record of how you arrived
+lasts 30 minutes of inactivity in this tab only, and then it goes on its own
+without you having to do anything. Google Analytics cookies are set to last for
+the browser session.
 
 **Your inquiry is separate.** What you send through the inquiry form goes to our
 form provider and on to us by email. That is how we reply to you, and it happens

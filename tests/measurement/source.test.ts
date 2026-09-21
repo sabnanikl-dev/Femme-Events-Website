@@ -1,7 +1,9 @@
 /**
  * The GBP source state machine: strict decoding, volatile candidates, idle
- * expiry, and the arrival-consumption ledger that stops a revoked landing from
- * coming back through reload, history or a later re-grant.
+ * expiry, and the arrival-consumption bookkeeping that stops a revoked landing
+ * from coming back through reload, history or a later re-grant. That
+ * bookkeeping is in-memory, so these tests check what reaches session storage
+ * as well as what the runtime reports.
  */
 
 import test from "node:test";
@@ -10,7 +12,7 @@ import assert from "node:assert/strict";
 import { SOURCE_IDLE_TTL_MS, SOURCE_STORAGE_KEY } from "../../src/lib/measurement/policy.ts";
 import { classifySearch } from "../../src/lib/measurement/sourceInput.ts";
 import { SERVICE_OPTIONS } from "../../src/data/serviceOptions.ts";
-import { setupHarness, storedLedger, storedSource } from "./harness/setup.ts";
+import { measurementSessionKeys, setupHarness, storedSource } from "./harness/setup.ts";
 
 const GBP = "?utm_source=google&utm_medium=organic&utm_campaign=gbp";
 
@@ -134,7 +136,11 @@ test("a back/forward document navigation is not an arrival either", () => {
   try {
     h.runtime.grant();
     assert.equal(storedSource(h), null);
-    assert.equal(storedLedger(h), null, "no arrival was even registered");
+    assert.deepEqual(
+      measurementSessionKeys(h),
+      [],
+      "no arrival was registered, and no bookkeeping was written either",
+    );
   } finally {
     h.teardown();
   }
@@ -172,15 +178,28 @@ test("a genuinely new tagged arrival after a withdrawal is captured again", () =
   }
 
   // Same tab, consent granted, and the visitor clicks the GBP listing again:
-  // a real forward document navigation, so a new arrival ordinal is issued.
-  const next = setupHarness({ search: GBP, navigationType: "navigate", init: false });
+  // a real forward document navigation, so this is a new arrival. Arrival
+  // ordinals are per document now that the bookkeeping is volatile, so what
+  // identifies this as a new arrival is the record itself: it was captured in
+  // this document, at this document's clock, not carried over from the revoked
+  // one.
+  // A minute later, and well inside the six-month preference carried over.
+  const landed = 1_600_000_060_000;
+  const next = setupHarness({
+    search: GBP,
+    navigationType: "navigate",
+    init: false,
+    startTime: landed,
+  });
   try {
     for (const [key, value] of carriedSession) next.env.session.raw.set(key, value);
     for (const [key, value] of carriedLocal) next.env.local.raw.set(key, value);
     next.runtime.init();
     const snapshot = next.runtime.snapshotSource();
     assert.equal(snapshot?.campaign, "gbp");
-    assert.equal(snapshot?.arrival, 2, "a new arrival ordinal, not the revoked one");
+    const record = storedSource(next) as Record<string, unknown>;
+    assert.equal(record.t, landed, "captured now, not restored from the revoked landing");
+    assert.equal(record.a, landed);
   } finally {
     next.teardown();
   }

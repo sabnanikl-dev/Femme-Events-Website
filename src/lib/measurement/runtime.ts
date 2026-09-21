@@ -24,6 +24,7 @@ import { resolveMeasurementConfig } from "./env.ts";
 import type { MeasurementConfig } from "./env.ts";
 import { createGa4Adapter } from "./ga4Adapter.ts";
 import type { Ga4Adapter } from "./ga4Adapter.ts";
+import { SOURCE_IDLE_TTL_MS } from "./policy.ts";
 import { routeLabelFor } from "./routes.ts";
 import { validateEvent } from "./schema.ts";
 import type { EventParams } from "./schema.ts";
@@ -31,13 +32,10 @@ import { classifySearch } from "./sourceInput.ts";
 import {
   APPROVED_TUPLE,
   clearStoredSource,
-  consumeAllArrivals,
-  consumeArrival,
+  createArrivalLedger,
   documentNavigationType,
-  isArrivalEligible,
   isCandidateAlive,
   readStoredSource,
-  registerArrival,
   writeStoredSource,
 } from "./sourceState.ts";
 import type { SourceRecord, SourceTuple } from "./sourceState.ts";
@@ -98,6 +96,21 @@ export function createMeasurementRuntime(): MeasurementRuntime {
   /** Volatile pre-choice source. Never written down, never transmitted. */
   let candidate: SourceRecord | null = null;
 
+  /**
+   * Arrival bookkeeping for this document, in memory. Source-derived state
+   * before a choice stays volatile, so this is not written to session storage
+   * and a refusal leaves nothing behind either.
+   */
+  const ledger = createArrivalLedger();
+
+  /**
+   * Set when a clear could not be verified — session removal refused and the
+   * record not even overwritable. While it is set, stored source is not read
+   * or trusted in this document at all. It is cleared only by successfully
+   * writing a new record over the key, or by a later verified clear.
+   */
+  let storedSourceDistrusted = false;
+
   let currentPathname: string | null = null;
   let lastCountedPathname: string | null = null;
   let lastNavigationKey: string | null = null;
@@ -120,6 +133,8 @@ export function createMeasurementRuntime(): MeasurementRuntime {
 
   /** Current hop of the chained teardown timer for the consent-expiry instant. */
   let expiryTimer: unknown = null;
+  /** Teardown deadline for the 30-minute source idle window. */
+  let sourceTimer: unknown = null;
   let releaseLifecycle: (() => void) | null = null;
 
   function notify(): void {
@@ -138,63 +153,119 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     adapter?.setCampaign(record ? APPROVED_TUPLE : null, activeRouteLabel());
   }
 
+  /**
+   * Which grant is in force right now, identified by its expiry instant, or
+   * `null` when there is not an effective one. Read from storage rather than
+   * remembered, for the same reason consent itself is: a cached answer is the
+   * one thing an expired or externally cleared preference cannot correct.
+   */
+  function grantIdentity(): number | null {
+    const consent = readConsent(now());
+    return consent.status === "granted" ? consent.expiresAt : null;
+  }
+
   /** Reads stored source, clearing expired/corrupt state and purging campaign. */
   function currentSource(): SourceRecord | null {
-    const record = status === "granted" ? readStoredSource(now()) : null;
+    const record =
+      status === "granted" && !storedSourceDistrusted
+        ? readStoredSource(now(), grantIdentity())
+        : null;
     syncCampaign(record);
     return record;
   }
 
-  /** Only real navigation and user actions extend the 30-minute idle window. */
+  /**
+   * Clears stored source and records whether the clear can be stood behind.
+   *
+   * A removal that was refused and could not even be overwritten leaves a
+   * readable record this document must never use again — not on the next
+   * navigation, and not if the visitor grants again.
+   */
+  function invalidateStoredSource(): void {
+    storedSourceDistrusted = clearStoredSource() === "failed";
+  }
+
+  /** Writes a record and, on success, re-establishes trust in the key. */
+  function persistSource(record: SourceRecord): boolean {
+    const written = writeStoredSource(record);
+    // The key now holds a record this document just wrote, so whatever it held
+    // before is gone and there is nothing left to distrust.
+    if (written) storedSourceDistrusted = false;
+    return written;
+  }
+
+  /**
+   * Only real navigation and user actions extend the 30-minute idle window.
+   *
+   * Stored source is neither read nor rewritten unless consent is currently a
+   * grant: refreshing a persisted marketing record for an undecided, refused or
+   * lapsed visitor would keep an arrival alive that is no longer allowed to
+   * exist, and would let it come back at the next grant.
+   */
   function refreshActivity(): void {
     const stamp = now();
-    const record = readStoredSource(stamp);
-    if (record) {
-      writeStoredSource({ ...record, lastActivity: stamp });
-      syncCampaign(record);
-      return;
+    if (status === "granted" && !storedSourceDistrusted) {
+      const record = readStoredSource(stamp, grantIdentity());
+      if (record) {
+        const refreshed = { ...record, lastActivity: stamp };
+        const written = persistSource(refreshed);
+        syncCampaign(record);
+        // If the refresh could not be written, the record on disk still has its
+        // old activity stamp, so the deadline follows that one rather than a
+        // later window this document only wished it had.
+        armSourceDeadline(written ? refreshed : record);
+        return;
+      }
     }
     syncCampaign(null);
     if (candidate) {
       candidate = isCandidateAlive(candidate, stamp) ? { ...candidate, lastActivity: stamp } : null;
     }
+    armSourceDeadline(candidate);
   }
 
   function captureArrival(): void {
     const stamp = now();
-    const arrival = registerArrival();
+    const arrival = ledger.register();
     const record: SourceRecord = {
       ...APPROVED_TUPLE,
       capturedAt: stamp,
       lastActivity: stamp,
       arrival,
+      consentEpoch: null,
     };
     if (status === "granted") {
-      writeStoredSource(record);
-      consumeArrival(arrival);
+      const stored = { ...record, consentEpoch: grantIdentity() };
+      persistSource(stored);
+      ledger.consume(arrival);
       candidate = null;
-      syncCampaign(record);
+      syncCampaign(stored);
+      armSourceDeadline(stored);
       return;
     }
     if (status === "denied") {
       // A refused visitor captures nothing at all; burn the arrival immediately.
-      consumeArrival(arrival);
+      ledger.consume(arrival);
       return;
     }
     candidate = record;
+    armSourceDeadline(candidate);
   }
 
   function discardSourceForUnsupportedInput(): void {
-    registerArrival();
-    consumeAllArrivals();
+    ledger.consumeAll();
     candidate = null;
-    clearStoredSource();
+    invalidateStoredSource();
     syncCampaign(null);
+    clearSourceTimer();
   }
 
   function startAdapter(): void {
     if (!adapter || adapter.isStarted()) return;
-    const record = status === "granted" ? readStoredSource(now()) : null;
+    const record =
+      status === "granted" && !storedSourceDistrusted
+        ? readStoredSource(now(), grantIdentity())
+        : null;
     appliedSourceArrival = record ? record.arrival : 0;
     adapter.start({ routeLabel: activeRouteLabel(), source: record ? APPROVED_TUPLE : null });
   }
@@ -210,8 +281,9 @@ export function createMeasurementRuntime(): MeasurementRuntime {
   function applyRevoked(next: ConsentStatus): void {
     status = next;
     candidate = null;
-    consumeAllArrivals();
-    clearStoredSource();
+    ledger.consumeAll();
+    invalidateStoredSource();
+    clearSourceTimer();
     appliedSourceArrival = 0;
     lastCountedPathname = null;
     // `emittedSuccessOperations` is deliberately *not* cleared. An operation
@@ -225,9 +297,25 @@ export function createMeasurementRuntime(): MeasurementRuntime {
   function applyGranted(): void {
     status = "granted";
     const stamp = now();
-    if (candidate && isCandidateAlive(candidate, stamp) && isArrivalEligible(candidate.arrival)) {
-      writeStoredSource({ ...candidate, lastActivity: stamp });
-      consumeArrival(candidate.arrival);
+    const eligible =
+      candidate !== null && isCandidateAlive(candidate, stamp) && ledger.isEligible(candidate.arrival);
+    if (eligible && candidate) {
+      const promoted: SourceRecord = {
+        ...candidate,
+        lastActivity: stamp,
+        consentEpoch: grantIdentity(),
+      };
+      persistSource(promoted);
+      ledger.consume(candidate.arrival);
+      armSourceDeadline(promoted);
+    } else {
+      // A grant only ever adopts attribution it just wrote itself. Anything
+      // already sitting in session storage belongs to some earlier grant — a
+      // record left behind by a refused removal, or one this document was
+      // never allowed to read — and a new choice is not the moment to start
+      // trusting it.
+      invalidateStoredSource();
+      clearSourceTimer();
     }
     candidate = null;
     scheduleExpiryCheck(readConsent(stamp).expiresAt);
@@ -307,6 +395,75 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     expiryTimer = handle;
   }
 
+  function clearSourceTimer(): void {
+    if (sourceTimer === null) return;
+    try {
+      (globalThis as { clearTimeout?: (handle: unknown) => void }).clearTimeout?.(sourceTimer);
+    } catch {
+      // A missing timer implementation is not an error here.
+    }
+    sourceTimer = null;
+  }
+
+  /**
+   * Arms the teardown deadline for the 30-minute source idle window.
+   *
+   * Checking expiry only when something happens to read the record is not the
+   * same as expiring it: a document that is granted, attributed and then simply
+   * left alone keeps its provider campaign context, and any provider-originated
+   * traffic goes on carrying it. So the boundary gets its own deadline.
+   *
+   * It is a deadline, not a heartbeat. No hop reads for the sake of reading,
+   * sends anything, or extends the window; the only thing that can happen when
+   * it fires is that attribution goes away. Activity re-arms it, which is why
+   * the record it was armed from is carried through: a refresh replaces the
+   * timer rather than stacking another one.
+   */
+  function armSourceDeadline(from: SourceRecord | null): void {
+    clearSourceTimer();
+    if (!from) return;
+    const deadline = from.lastActivity + SOURCE_IDLE_TTL_MS;
+    if (now() >= deadline) {
+      expireSource();
+      return;
+    }
+    const set = (globalThis as { setTimeout?: (fn: () => void, ms: number) => unknown }).setTimeout;
+    if (typeof set !== "function") return;
+    const handle = set(() => {
+      sourceTimer = null;
+      // Re-read the clock rather than trusting the hop to have been punctual.
+      if (now() >= deadline) expireSource();
+      else armSourceDeadline(from);
+    }, deadline - now());
+    // Never hold a Node test process (or a page) open just for this check.
+    (handle as { unref?: () => void })?.unref?.();
+    sourceTimer = handle;
+  }
+
+  /** The idle window closed: drop attribution and the provider's campaign. */
+  function expireSource(): void {
+    clearSourceTimer();
+    candidate = null;
+    invalidateStoredSource();
+    syncCampaign(null);
+  }
+
+  /**
+   * Re-checks the source deadline without refreshing it.
+   *
+   * A throttled, frozen or restored document cannot be trusted to have fired
+   * its timer on time, or at all, so becoming visible or restored is its own
+   * checkpoint — and it has to happen before anything reads the record, not
+   * after.
+   */
+  function revalidateSource(): void {
+    if (!initialised || config.mode === "disabled") return;
+    const stamp = now();
+    if (candidate && !isCandidateAlive(candidate, stamp)) candidate = null;
+    const record = currentSource();
+    armSourceDeadline(record ?? candidate);
+  }
+
   /**
    * Re-checks at document lifecycle boundaries. A hidden or frozen document may
    * have had its timers throttled for hours, so becoming visible/restored is
@@ -324,6 +481,7 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     if (typeof win.addEventListener !== "function") return;
     const checkpoint = () => {
       revalidateConsent();
+      revalidateSource();
     };
     const events: [string, () => void][] = [
       ["pageshow", checkpoint],
@@ -376,6 +534,13 @@ export function createMeasurementRuntime(): MeasurementRuntime {
 
     status = readConsent(now()).status;
 
+    // Fail closed on arrival. A source record that outlived its grant - the
+    // preference expired, was refused, was withdrawn in another document, or is
+    // unreadable - is burnt here, before a navigation can refresh it or a later
+    // grant can adopt it. Only a genuinely new arrival captured below survives
+    // an undecided document, and it survives in memory.
+    if (status !== "granted") invalidateStoredSource();
+
     const here = locationOf();
     currentPathname = here.pathname;
     lastNavigationKey = navigationKey(here.pathname, here.search);
@@ -391,6 +556,10 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     if (status === "granted") {
       scheduleExpiryCheck(readConsent(now()).expiresAt);
       startAdapter();
+      // A restored same-tab record keeps whatever idle window it had left.
+      armSourceDeadline(
+        storedSourceDistrusted ? null : readStoredSource(now(), grantIdentity()),
+      );
     }
     subscribeToOtherDocuments(onOtherDocumentChange);
     subscribeToLifecycle();
@@ -448,10 +617,18 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     lastNavigationKey = key;
     currentPathname = pathname;
 
-    if (repeated || action === "POP") {
-      // StrictMode re-runs and history traversals refresh the idle window but
-      // never create a new arrival and never clear existing state.
+    if (repeated) {
+      // A StrictMode re-run of the same entry refreshes the idle window and
+      // nothing else; this URL was already classified when it was first seen.
       refreshActivity();
+    } else if (action === "POP") {
+      // A history traversal is never an arrival, so a valid historic GBP entry
+      // must not mint attribution again. Source-bearing input that is *not* the
+      // approved tuple still has to fail closed though: without this, pressing
+      // Back to a different campaign left the earlier GBP attribution in place
+      // and went on labelling later events with it.
+      if (classifySearch(search) === "unsupported") discardSourceForUnsupportedInput();
+      else refreshActivity();
     } else {
       const classification = classifySearch(search);
       if (classification === "gbp") captureArrival();
@@ -539,6 +716,7 @@ export function createMeasurementRuntime(): MeasurementRuntime {
     init,
     destroy: () => {
       clearExpiryTimer();
+      clearSourceTimer();
       releaseLifecycle?.();
       releaseLifecycle = null;
     },

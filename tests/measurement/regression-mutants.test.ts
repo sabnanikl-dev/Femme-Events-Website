@@ -19,10 +19,12 @@ import type { Ga4Adapter, Ga4AdapterOptions } from "../../src/lib/measurement/ga
 import { writeConsent } from "../../src/lib/measurement/consentStore.ts";
 import { decideSourceFields } from "../../src/lib/measurement/formSource.ts";
 import type { MeasurementMode } from "../../src/lib/measurement/env.ts";
-import { CONSENT_TTL_MS } from "../../src/lib/measurement/policy.ts";
+import { CONSENT_TTL_MS, SOURCE_STORAGE_KEY } from "../../src/lib/measurement/policy.ts";
 import { classifySearch } from "../../src/lib/measurement/sourceInput.ts";
 import type { SourceClassification } from "../../src/lib/measurement/sourceInput.ts";
 import { validateEvent } from "../../src/lib/measurement/schema.ts";
+import { readStoredSource, writeStoredSource } from "../../src/lib/measurement/sourceState.ts";
+import type { SourceRecord } from "../../src/lib/measurement/sourceState.ts";
 import { installFakeEnvironment } from "./harness/fakeEnvironment.ts";
 import { installFakeTag } from "./harness/fakeTag.ts";
 import { FIXTURE_MEASUREMENT_ID, setupHarness } from "./harness/setup.ts";
@@ -309,13 +311,83 @@ test("a revoked arrival stays dead with the current withdrawal path", () => {
   assertRevokedArrivalStaysDead((h) => h.runtime.withdraw());
 });
 
-test("the same check fails when withdrawal forgets to clear stored source state", () => {
-  assertFails("withdrawal that leaves session state behind", () =>
-    assertRevokedArrivalStaysDead((h) => {
-      const before = new Map(h.env.session.raw);
-      h.runtime.withdraw();
-      for (const [key, value] of before) h.env.session.raw.set(key, value);
-    }),
+/**
+ * A withdrawal that left its stored record behind used to be enough on its own
+ * to bring the arrival back, and this suite caught exactly that. It no longer
+ * is: a grant now adopts only attribution it has just written itself, so the
+ * leftover is cleared again before it can be read. That is the point of the
+ * repair, so the case is kept as a positive assertion rather than pretended to
+ * be a live mutant — the mutant for the mechanism that *is* now load-bearing
+ * is `assertLeftoverRecordIsNotAdopted` below.
+ */
+test("restoring the withdrawn session bytes still does not resurrect the arrival", () => {
+  assertRevokedArrivalStaysDead((h) => {
+    const before = new Map(h.env.session.raw);
+    h.runtime.withdraw();
+    for (const [key, value] of before) h.env.session.raw.set(key, value);
+  });
+});
+
+/**
+ * The record-level guarantee behind that: a stored record names the grant it
+ * was captured under, so one that outlived its grant is not this grant's
+ * attribution. A reader that ignores which grant a record belongs to is the
+ * mutant, and it must be caught.
+ */
+type SourceReader = (now: number, consentEpoch: number | null) => SourceRecord | null;
+
+function readIgnoringGrant(now: number, _consentEpoch: number | null): SourceRecord | null {
+  // Identical to the real reader except that it never asks whose grant this is.
+  return readStoredSource(now, readStoredGrantEpoch());
+}
+
+/** The epoch the stored record itself claims — i.e. always a "match". */
+function readStoredGrantEpoch(): number | null {
+  const raw = (globalThis as { sessionStorage?: Storage }).sessionStorage?.getItem(
+    SOURCE_STORAGE_KEY,
+  );
+  if (raw === null || raw === undefined) return null;
+  const parsed: unknown = JSON.parse(raw);
+  const epoch = (parsed as Record<string, unknown>).g;
+  return typeof epoch === "number" ? epoch : null;
+}
+
+function assertLeftoverRecordIsNotAdopted(read: SourceReader): void {
+  const env = installFakeEnvironment();
+  try {
+    const first = env.now();
+    // Written under the grant that was in force then.
+    writeStoredSource({
+      source: "google",
+      medium: "organic",
+      campaign: "gbp",
+      capturedAt: first,
+      lastActivity: first,
+      arrival: 1,
+      consentEpoch: first + CONSENT_TTL_MS,
+    });
+    // The visitor withdrew and granted again a minute later, and session
+    // removal had been refused, so the old record is still sitting there.
+    env.advance(60_000);
+    const currentGrant = env.now() + CONSENT_TTL_MS;
+
+    assert.equal(
+      read(env.now(), currentGrant),
+      null,
+      "a record from the previous grant was adopted by the new one",
+    );
+  } finally {
+    env.restore();
+  }
+}
+
+test("a stored record from an earlier grant is not adopted by the current one", () => {
+  assertLeftoverRecordIsNotAdopted(readStoredSource);
+});
+
+test("the same check fails for a reader that ignores which grant a record belongs to", () => {
+  assertFails("source reader without grant binding", () =>
+    assertLeftoverRecordIsNotAdopted(readIgnoringGrant),
   );
 });
 

@@ -121,8 +121,9 @@ itself. Layer 2 carries the no-collection requirement after load.
 
 Then: only the inventoried GA4 cookies are deleted (`_ga` and
 `_ga_<container>`, matching host and parent domains, path `/`) — unrelated
-application cookies and storage are never touched; the session source record and
-arrival ledger are cleared; and the six-month preference record is updated, which
+application cookies and storage are never touched; the session source record is
+cleared and the in-memory arrival bookkeeping is burnt; and the six-month
+preference record is updated, which
 fires `storage` in every other open same-origin document so each one runs the
 same in-place teardown. Peers are never reloaded either, because a peer tab may
 also hold a half-written inquiry.
@@ -205,28 +206,86 @@ Three pieces of state, and no durable marketing identifier anywhere:
 |---|---|---|
 | Candidate (undecided visitor) | volatile memory only | 30-minute idle |
 | Granted record | `sessionStorage` `femme.analytics.source.v1` | 30-minute idle |
-| Arrival ledger | `sessionStorage` `femme.analytics.arrival.v1` | tab lifetime |
+| Arrival bookkeeping | volatile memory only | document lifetime |
+
+**Nothing at all is written to session storage before an explicit grant, and a
+refusal writes nothing.** Arrival bookkeeping is source-derived state, so it is
+held in memory and never persisted; the granted record above is the only
+measurement key session storage ever holds.
 
 Expiry is inclusive: at exactly the boundary the record is cleared before use or
 refresh. Only real navigation and user actions refresh the idle window — there is
-no background heartbeat. Future timestamps, wrong versions and corrupt records
-fail closed and are cleared.
+no background heartbeat.
+
+The 30-minute boundary also has its **own teardown deadline**, armed on capture
+and re-armed on each activity refresh. Checking expiry only when something
+happens to read the record is not the same as expiring it: a document that is
+granted, attributed and then simply left alone would otherwise keep its provider
+campaign context, and provider-originated traffic would go on carrying it. When
+the deadline falls due the stored record is cleared and the provider campaign is
+explicitly purged. It is a deadline, not a heartbeat — no hop reads for the sake
+of reading, sends anything or extends the window. Because a throttled, frozen or
+restored document cannot be trusted to have fired its timer at all, the source
+deadline is also re-checked (never refreshed) at every lifecycle checkpoint,
+before anything can use the record.
+
+Future timestamps, wrong versions and corrupt records fail closed and are
+cleared. So does a record that names a different grant — see below.
 
 ### The arrival-consumption mechanism
 
-The ledger holds two integers and no campaign values: `seq`, how many
-source-bearing arrivals this tab has seen, and `consumed`, the highest arrival
-already resolved. A candidate is promotable only while `seq > consumed`.
+Arrival bookkeeping holds two integers and no campaign values: `seq`, how many
+source-bearing arrivals this document has seen, and `consumed`, the highest
+arrival already resolved. A candidate is promotable only while `seq > consumed`.
 
 - A **reload** or a **back/forward** document navigation is not an arrival:
   `performance.getEntriesByType("navigation")[0].type` gates capture, so the URL
   is never re-read for attribution. An in-app `POP` navigation is likewise never
-  an arrival.
-- **Refusal or withdrawal** sets `consumed = seq`, burning every arrival the tab
-  knows about, and clears the stored record.
+  an arrival — but it *is* still classified, so Back to a **different**
+  campaign fails closed and clears the earlier GBP state rather than silently
+  keeping it.
+- **Refusal or withdrawal** sets `consumed = seq`, burning every arrival the
+  document knows about, and clears the stored record.
 - Therefore a later **re-grant**, a reload of the tagged URL, or Back to the
   original tagged entry all find nothing eligible. Only a genuinely new forward
   navigation carrying the approved tuple raises `seq` again.
+
+### Cleanup that can be stood behind
+
+`sessionStorage` can refuse `removeItem` on its own while reads and writes still
+work, and a cleanup that was merely attempted is not a cleanup. Clearing the
+source record is therefore verified, and reports one of three outcomes:
+
+| Outcome | What happened |
+|---|---|
+| `removed` | the key is provably gone |
+| `neutralised` | removal refused, so the record was overwritten with a value that cannot read back as attribution; no campaign values remain |
+| `failed` | neither worked, or the result could not be verified |
+
+A `failed` clear latches distrust: stored source is not read at all for the rest
+of that document. Across a document boundary the guarantee is carried by the
+record itself. Each stored record names **which grant it belongs to**, using
+that grant's expiry instant — a value the necessary preference already holds, so
+the approved consent record is not widened and nothing new is learned about the
+visitor. A withdrawal followed by a re-grant produces a different expiry, so a
+record left behind by a refused removal is not the new grant's attribution and
+is dropped.
+
+On top of both: **a grant only ever adopts attribution it has just written
+itself.** Whatever is already in session storage when a new choice is made
+belongs to an earlier grant, and a new choice is not the moment to start
+trusting it. Restoring a valid record on a same-tab reload under an unchanged
+grant is the one supported case, and it goes through initialisation, not
+through a grant.
+
+### Initialising without a grant
+
+At initialisation, if effective consent is anything other than a grant —
+undecided, refused, expired, version-mismatched, unreadable, or withdrawn in
+another document — any stored source record is burnt before anything can read
+or refresh it. Activity refresh likewise never reads or rewrites a persisted
+marketing record outside granted status. Only a genuinely new arrival captured
+in that document survives an undecided state, and it survives in memory.
 
 Limits: source continuity is same-tab only. Some browsers copy `sessionStorage`
 into a tab opened from a link, and some restore a session after a crash or

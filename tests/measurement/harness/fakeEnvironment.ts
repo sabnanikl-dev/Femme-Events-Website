@@ -19,6 +19,13 @@
 export type FakeStorage = Storage & {
   failWrites: boolean;
   failReads: boolean;
+  /**
+   * Removal fails on its own. Real areas do fail asymmetrically - a policy or
+   * quota condition can refuse `removeItem` while `getItem` and `setItem` still
+   * work - and cleanup that cannot be verified is exactly the case that must
+   * not be reported as a successful clear.
+   */
+  failRemovals: boolean;
   raw: Map<string, string>;
 };
 
@@ -28,6 +35,7 @@ export function createFakeStorage(): FakeStorage {
     raw,
     failWrites: false,
     failReads: false,
+    failRemovals: false,
     get length() {
       return raw.size;
     },
@@ -43,7 +51,7 @@ export function createFakeStorage(): FakeStorage {
       raw.set(key, String(value));
     },
     removeItem(key: string) {
-      if (store.failWrites) throw new Error("storage write blocked");
+      if (store.failWrites || store.failRemovals) throw new Error("storage removal blocked");
       raw.delete(key);
     },
     clear() {

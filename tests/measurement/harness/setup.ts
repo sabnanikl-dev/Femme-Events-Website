@@ -83,6 +83,22 @@ export function storedLedger(harness: Harness): unknown {
 }
 
 /**
+ * Every measurement key actually present in same-tab session storage.
+ *
+ * Source-derived state is the thing the policy says must not be written down
+ * before a choice or after a refusal, so the assertion has to be "no key at
+ * all", not "not the one key I remembered to look at".
+ */
+export function measurementSessionKeys(harness: Harness): string[] {
+  return [...harness.env.session.raw.keys()].filter((key) => key.startsWith("femme.analytics.")).sort();
+}
+
+/** The same question for the necessary preference area. */
+export function measurementLocalKeys(harness: Harness): string[] {
+  return [...harness.env.local.raw.keys()].filter((key) => key.startsWith("femme.analytics.")).sort();
+}
+
+/**
  * The controlled page context every payload carries: canonical origin plus a
  * static route label, a static title and an empty analytics referrer.
  */

@@ -24,6 +24,23 @@ function shotName(project: string, name: string): string {
 /** Every control that must stay usable, whatever the notice is showing. */
 const CONTROL_IDS = ["consent-allow", "consent-deny", "consent-details-toggle"] as const;
 
+/**
+ * Waits until a reveal animation has actually finished: fully opaque and back
+ * at its resting offset. Screenshots taken before this show a half-faded,
+ * displaced element and are not usable as visual evidence.
+ */
+async function expectMotionSettled(page: Page, selector: string): Promise<void> {
+  await page.waitForFunction((target) => {
+    const element = document.querySelector(target);
+    if (!element) return false;
+    const style = getComputedStyle(element);
+    if (Number(style.opacity) < 0.999) return false;
+    if (style.transform === "none" || style.transform === "") return true;
+    const matrix = new DOMMatrixReadOnly(style.transform);
+    return Math.abs(matrix.m41) < 0.5 && Math.abs(matrix.m42) < 0.5;
+  }, selector);
+}
+
 /** Fails if any part of the element sits outside the visible viewport. */
 async function expectWithinViewport(page: Page, testId: string): Promise<void> {
   const box = await page.getByTestId(testId).boundingBox();
@@ -300,6 +317,24 @@ test("package selection and the inquiry form are captured with the notice open",
 }, testInfo) => {
   await page.goto("/?service=the-full-femme#inquiry-form");
   await expect(page.locator("#interestedService")).toHaveValue("The Full Femme");
+  await expect(page.getByTestId("consent-panel")).toBeVisible();
+
+  // The form reveals itself with a `whileInView` transition, and the fragment
+  // scroll races it. A screenshot taken straight after `goto` therefore caught
+  // the form mid-fade and, at some widths, not even in frame - which is what
+  // made the earlier committed capture unusable as evidence. Scroll to the
+  // real form first, then wait for the reveal to settle.
+  //
+  // `#inquiry-form` is the heading block, and the form is its next sibling
+  // rather than a descendant (see `src/components/Inquiry.tsx`), so a
+  // descendant selector matches nothing and waits until the test times out.
+  const FORM = "#inquiry-form + form";
+  const form = page.locator(FORM);
+  await expect(form).toBeVisible();
+  await form.scrollIntoViewIfNeeded();
+  await expect(form).toBeInViewport();
+  await expectMotionSettled(page, FORM);
+
   await page.screenshot({
     path: shotName(testInfo.project.name, "07-package-and-notice"),
     fullPage: false,

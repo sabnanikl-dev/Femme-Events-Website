@@ -36,7 +36,26 @@ export function writeItem(kind: StorageKind, key: string, value: string): boolea
   }
 }
 
-/** @returns `true` only when the key was actually removed (or already absent). */
+/**
+ * Whether a key is there.
+ *
+ * `readItem` cannot answer this: it returns `null` both for "absent" and for
+ * "the area threw". Cleanup has to tell those apart, because "I could not look"
+ * is not "it is gone".
+ */
+export type ItemProbe = "absent" | "present" | "unreadable";
+
+export function probeItem(kind: StorageKind, key: string): ItemProbe {
+  try {
+    const store = area(kind);
+    if (!store) return "unreadable";
+    return store.getItem(key) === null ? "absent" : "present";
+  } catch {
+    return "unreadable";
+  }
+}
+
+/** @returns `true` only when `removeItem` itself did not fail. */
 export function removeItem(kind: StorageKind, key: string): boolean {
   try {
     const store = area(kind);

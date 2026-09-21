@@ -24,14 +24,12 @@ export const SOURCE_RECORD_VERSION = 1;
 /** 30-minute idle expiry, checked before every use and every activity refresh. */
 export const SOURCE_IDLE_TTL_MS = 30 * 60 * 1000;
 
-/**
- * Same-tab arrival ledger. Holds two integers and no marketing values: how many
- * source-bearing arrivals this tab has seen, and how many have been consumed
- * (promoted, refused or revoked). It is what stops a reload, a history
- * traversal or a later re-grant from resurrecting an already-revoked arrival.
+/*
+ * There is deliberately no arrival-ledger storage key. Arrival bookkeeping is
+ * source-derived state, so it is held in memory for the lifetime of the
+ * document and never written down — see `sourceState.ts`. Session storage is
+ * written only after an explicit grant, and only the source record above.
  */
-export const ARRIVAL_LEDGER_KEY = "femme.analytics.arrival.v1";
-export const ARRIVAL_LEDGER_VERSION = 1;
 
 /* ── Strict source-input bounds (approved proposals) ── */
 
